@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 
-export const createCommentTemplate = (data) => {
+const createCommentTemplate = (data) => {
   const {emoji, author, text, date} = data;
   const comentsDate = dayjs(date).format('YYYY/MM/D mm:HH');
 
@@ -18,3 +18,18 @@ export const createCommentTemplate = (data) => {
             </div>
           </li>`;
 };
+
+export default class CommentView {
+  constructor(comment) {
+    this._comment = comment;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createCommentTemplate(this._comment);
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

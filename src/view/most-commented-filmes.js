@@ -1,21 +1,20 @@
 import { createElement } from '../utils.js';
 
-const createCardContainerTemplate = () => (
-  `<section class="films">
-    <section class="films-list">
+const createMostCommentedFilmsTemplate = () => (
+  `<section class="films-list films-list--extra">
+      <h2 class="films-list__title">Most commented</h2>
       <div class="films-list__container">
       </div>
-    </section>
-  </section>`
+    </section>`
 );
 
-export default class SiteContent {
+export default class MostRatedView {
   constructor() {
     this._element = null;
   }
 
   getTemplate() {
-    return createCardContainerTemplate();
+    return createMostCommentedFilmsTemplate();
   }
 
   getElement() {
@@ -30,4 +29,3 @@ export default class SiteContent {
     this._element = null;
   }
 }
-

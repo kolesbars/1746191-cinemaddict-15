@@ -1,8 +1,9 @@
-import {createCommentTemplate} from './comment.js';
+import CommentView from './comment.js';
 import dayjs from 'dayjs';
+import {createElement} from '../utils.js';
 
 
-export const createPopupTemplate = (data) => {
+const createPopupTemplate = (data) => {
   const {poster, name, description, date, rating, comments, genre, duration, director, screenwriters, actors, country, age, isInWatchlist, isWatched, isFavorite} = data;
 
   const releaseDate = dayjs(date).format('D MMMM YYYY');
@@ -21,7 +22,7 @@ export const createPopupTemplate = (data) => {
   const commentsCount = comments.length;
   const commentsArray = [];
   for (let i = 0; i < commentsCount; i++) {
-    commentsArray.push(createCommentTemplate(comments[i]));
+    commentsArray.push(new CommentView(comments[i]).getTemplate());
   }
   const commentElements = commentsArray.join();
 
@@ -147,3 +148,26 @@ export const createPopupTemplate = (data) => {
     </div>
   </form>
 </section>`;};
+
+export default class PopupView {
+  constructor(popup) {
+    this._popup = popup;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createPopupTemplate(this._popup);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
