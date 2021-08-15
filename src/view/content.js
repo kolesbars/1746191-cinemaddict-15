@@ -1,4 +1,4 @@
-import { createElement } from '../utils.js';
+import Abstarct from './abstract.js';
 
 const createCardContainerTemplate = () => (
   `<section class="films">
@@ -9,25 +9,9 @@ const createCardContainerTemplate = () => (
   </section>`
 );
 
-export default class SiteContent {
-  constructor() {
-    this._element = null;
-  }
-
+export default class SiteContent extends Abstarct {
   getTemplate() {
     return createCardContainerTemplate();
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }
 

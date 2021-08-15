@@ -1,4 +1,4 @@
-import { createElement } from '../utils.js';
+import Abstarct from './abstract.js';
 
 const createMenuTemplate = (filter) => {
   const {wathclist, hystory, favorites} = filter;
@@ -13,25 +13,13 @@ const createMenuTemplate = (filter) => {
   </nav>`;
 };
 
-export default class SiteMenuView {
+export default class SiteMenuView extends Abstarct {
   constructor(filter) {
+    super();
     this._filter = filter;
-    this._element = null;
   }
 
   getTemplate() {
     return createMenuTemplate(this._filter);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }

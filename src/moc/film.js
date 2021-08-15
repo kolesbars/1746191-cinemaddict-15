@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import {getRandomInteger, getRandomFloat} from '../utils.js';
+import {getRandomInteger, getRandomFloat} from '../utils/common.js';
 
 const COMMENTED_PERIOD = 730;
 const RELEASE_PERIOD = 100;

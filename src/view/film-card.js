@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import {createElement} from '../utils.js';
+import Abstarct from './abstract.js';
 
 const createCardTemplate = (data) => {
   const {poster, name, description, rating, comments, date, genre, duration, isInWatchlist, isWatched, isFavorite} = data;
@@ -36,25 +36,26 @@ const createCardTemplate = (data) => {
         </article>`;
 };
 
-export default class FilmCardView {
+export default class FilmCardView extends Abstarct {
   constructor(film) {
+    super();
     this._film = film;
-    this._element = null;
+    this._showPopupClickHandler = this._showPopupClickHandler.bind(this);
   }
 
   getTemplate() {
     return createCardTemplate(this._film);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
+  _showPopupClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.click();
   }
 
-  removeElement() {
-    this._element = null;
+  setShowPopupClickHandler(callback) {
+    this._callback.click = callback;
+    this.getElement().querySelector('.film-card__title').addEventListener('click', this._showPopupClickHandler);
+    this.getElement().querySelector('.film-card__poster').addEventListener('click', this._showPopupClickHandler);
+    this.getElement().querySelector('.film-card__comments').addEventListener('click', this._showPopupClickHandler);
   }
 }

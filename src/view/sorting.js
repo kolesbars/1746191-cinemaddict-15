@@ -1,4 +1,4 @@
-import { createElement } from '../utils.js';
+import Abstarct from './abstract.js';
 
 const createSortTemplate = () => (
   `<ul class="sort">
@@ -8,24 +8,8 @@ const createSortTemplate = () => (
   </ul>`
 );
 
-export default class SortingView {
-  constructor() {
-    this._element = null;
-  }
-
+export default class SortingView extends Abstarct {
   getTemplate() {
     return createSortTemplate();
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }

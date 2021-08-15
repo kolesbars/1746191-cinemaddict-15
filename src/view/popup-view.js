@@ -1,6 +1,6 @@
 import CommentView from './comment.js';
 import dayjs from 'dayjs';
-import {createElement} from '../utils.js';
+import Abstarct from './abstract.js';
 
 
 const createPopupTemplate = (data) => {
@@ -149,25 +149,25 @@ const createPopupTemplate = (data) => {
   </form>
 </section>`;};
 
-export default class PopupView {
+export default class PopupView extends Abstarct {
   constructor(popup) {
+    super();
     this._popup = popup;
-    this._element = null;
+    this._closeButtonClickHandler = this._closeButtonClickHandler.bind(this);
   }
 
   getTemplate() {
     return createPopupTemplate(this._popup);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
+  _closeButtonClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.click();
   }
 
-  removeElement() {
-    this._element = null;
+  setCloseButtonClickHandler(callback) {
+    this._callback.click = callback;
+    this.getElement().querySelector('.film-details__close').addEventListener('click', this._closeButtonClickHandler);
   }
+
 }

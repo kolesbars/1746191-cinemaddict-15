@@ -10,7 +10,7 @@ import MostRatedView from './view/most-commented-filmes';
 import PopupView from './view/popup-view.js';
 import {generateFilmCards} from './moc/film.js';
 import {generateFilters} from './moc/filters.js';
-import {renderElement, RenderPosition, renderPopup} from './utils.js';
+import {renderElement, RenderPosition, renderPopup} from './utils/render.js';
 
 const FILM_COUNT = 25;
 const FILM_COUNT_PER_STEP = 5;
@@ -22,67 +22,77 @@ const filters = generateFilters(cardsData);
 const headerContainer = document.querySelector('.header');
 const mainContainer = document.querySelector('.main');
 const footerContainer = document.querySelector('.footer');
+const contentContainer = new SiteContent();
 
 renderElement(headerContainer, new RatingView().getElement(), RenderPosition.BEFOREEND);
 renderElement(mainContainer, new SiteMenuView(filters).getElement(), RenderPosition.BEFOREEND);
 renderElement(mainContainer, new SortingView().getElement(), RenderPosition.BEFOREEND);
-renderElement(mainContainer, new SiteContent().getElement(), RenderPosition.BEFOREEND);
+renderElement(mainContainer, contentContainer.getElement(), RenderPosition.BEFOREEND);
 
-const contentContainer = mainContainer.querySelector('.films');
-renderElement(contentContainer, new TopFilmsView().getElement(), RenderPosition.BEFOREEND);
-renderElement(contentContainer, new MostRatedView().getElement(), RenderPosition.BEFOREEND);
+const renderExtraFilms = () => {
+  const topRatedFilmElement =  new TopFilmsView();
+  const mostCommentedFilmsElement = new MostRatedView();
+  renderElement(contentContainer.getElement(), topRatedFilmElement.getElement(), RenderPosition.BEFOREEND);
+  renderElement(contentContainer.getElement(), mostCommentedFilmsElement.getElement(), RenderPosition.BEFOREEND);
 
-const mainContentContainer = contentContainer.querySelector('.films-list');
-const cardsContainers = contentContainer.querySelectorAll('.films-list__container');
+  for (let i = 0; i < EXTRA_FILMS_COUNT; i++) {
+    const topFilmsContainer = topRatedFilmElement.getElement().querySelector('.films-list__container');
+    const topFilmCard = new FilmCardView(cardsData[i]);
+    const popupCard = new PopupView(cardsData[i]);
+    renderElement(topFilmsContainer, topFilmCard.getElement(), RenderPosition.BEFOREEND);
+    renderPopup(topFilmCard, popupCard);
+  }
 
-for (let i = 0; i < FILM_COUNT_PER_STEP; i++) {
-  const filmCard = new FilmCardView(cardsData[i]);
-  const popupCard = new PopupView(cardsData[i]);
+  for (let i = 0; i < EXTRA_FILMS_COUNT; i++) {
+    const mostCommentsContainer = mostCommentedFilmsElement.getElement().querySelector('.films-list__container');
+    const mostCommentedFilmCard = new FilmCardView(cardsData[i]);
+    const popupCard = new PopupView(cardsData[i]);
+    renderElement(mostCommentsContainer, mostCommentedFilmCard.getElement(), RenderPosition.BEFOREEND);
+    renderPopup(mostCommentedFilmCard, popupCard);
+  }
+};
 
-  renderElement(cardsContainers[0], filmCard.getElement(), RenderPosition.BEFOREEND);
-  renderPopup (filmCard, popupCard);
-}
 
-if (FILM_COUNT_PER_STEP < cardsData.length) {
-  renderElement(mainContentContainer, new ShowMoreView().getElement(), RenderPosition.BEFOREEND);
+const renderFilms = () => {
+  const mainContentContainer = contentContainer.getElement().querySelector('.films-list');
+  const cardsContainers = contentContainer.getElement().querySelector('.films-list__container');
 
-  const loadMoreButton = contentContainer.querySelector('.films-list__show-more');
-  let filmsCountMin = FILM_COUNT_PER_STEP;
-  let filmsCountMax = filmsCountMin + FILM_COUNT_PER_STEP;
+  cardsData.slice(0, Math.min(cardsData.length, FILM_COUNT_PER_STEP)).forEach((film) => {
+    const filmCard = new FilmCardView(film);
+    const popupCard = new PopupView(film);
 
-  loadMoreButton.addEventListener('click', (evt) => {
-    evt.preventDefault();
-    for (let i = filmsCountMin; i < filmsCountMax; i++) {
-      const filmCard = new FilmCardView(cardsData[i]);
-      const popupCard = new PopupView(cardsData[i]);
-
-      renderElement(cardsContainers[0], filmCard.getElement(), RenderPosition.BEFOREEND);
-
-      renderPopup(filmCard, popupCard);
-    }
-
-    filmsCountMin += FILM_COUNT_PER_STEP;
-    filmsCountMax += FILM_COUNT_PER_STEP;
-
-    if (filmsCountMax >= cardsData.length) {
-      loadMoreButton.remove();
-    }
+    renderElement(cardsContainers, filmCard.getElement(), RenderPosition.BEFOREEND);
+    renderPopup (filmCard, popupCard);
   });
-}
 
-for (let i = 0; i < EXTRA_FILMS_COUNT; i++) {
-  const topFilmCard = new FilmCardView(cardsData[i]);
-  const popupCard = new PopupView(cardsData[i]);
-  renderElement(cardsContainers[1], topFilmCard.getElement(), RenderPosition.BEFOREEND);
-  renderPopup(topFilmCard, popupCard);
-}
+  if (FILM_COUNT_PER_STEP < cardsData.length) {
+    const loadMoreButton = new ShowMoreView();
+    let filmsCount = FILM_COUNT_PER_STEP;
 
-for (let i = 0; i < EXTRA_FILMS_COUNT; i++) {
-  const mostCommentedFilmCard = new FilmCardView(cardsData[i]);
-  const popupCard = new PopupView(cardsData[i]);
-  renderElement(cardsContainers[2], mostCommentedFilmCard.getElement(), RenderPosition.BEFOREEND);
-  renderPopup(mostCommentedFilmCard, popupCard);
-}
+    renderElement(mainContentContainer, loadMoreButton.getElement(), RenderPosition.BEFOREEND);
+
+    loadMoreButton.setClickHandler(() => {
+      cardsData.slice(filmsCount, filmsCount + FILM_COUNT_PER_STEP).forEach((film) => {
+        const filmCard = new FilmCardView(film);
+        const popupCard = new PopupView(film);
+
+        renderElement(cardsContainers, filmCard.getElement(), RenderPosition.BEFOREEND);
+
+        renderPopup(filmCard, popupCard);
+      });
+
+      filmsCount += FILM_COUNT_PER_STEP;
+
+      if (filmsCount >= cardsData.length) {
+        loadMoreButton.getElement().remove();
+        loadMoreButton.removeElement();
+      }
+    });
+  }
+};
+
+renderFilms();
+renderExtraFilms();
 
 const statisticsContainer = footerContainer.querySelector('.footer__statistics');
 renderElement(statisticsContainer, new FilmQuantityView().getElement(), RenderPosition.BEFOREEND);
