@@ -1,4 +1,4 @@
-import Abstarct from './abstract.js';
+import Abstract from './abstract.js';
 
 const createRatingTemplate = () => (
   `<section class="header__profile profile">
@@ -7,7 +7,7 @@ const createRatingTemplate = () => (
   </section>`
 );
 
-export default class RatingView extends Abstarct {
+export default class RatingView extends Abstract {
   getTemplate() {
     return createRatingTemplate();
   }

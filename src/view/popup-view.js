@@ -1,6 +1,6 @@
 import CommentView from './comment.js';
 import dayjs from 'dayjs';
-import Abstarct from './abstract.js';
+import Abstract from './abstract.js';
 
 
 const createPopupTemplate = (data) => {
@@ -149,11 +149,14 @@ const createPopupTemplate = (data) => {
   </form>
 </section>`;};
 
-export default class PopupView extends Abstarct {
+export default class PopupView extends Abstract {
   constructor(popup) {
     super();
     this._popup = popup;
     this._closeButtonClickHandler = this._closeButtonClickHandler.bind(this);
+    this._watchListClickHandler = this._watchListClickHandler.bind(this);
+    this._watchedClickHandler = this._watchedClickHandler.bind(this);
+    this._favoritesClickHandler = this._favoritesClickHandler.bind(this);
   }
 
   getTemplate() {
@@ -165,9 +168,41 @@ export default class PopupView extends Abstarct {
     this._callback.click();
   }
 
+  _watchListClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.watchListClick();
+  }
+
+  _watchedClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.watchedClick();
+  }
+
+  _favoritesClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.favoritesClick();
+  }
+
   setCloseButtonClickHandler(callback) {
     this._callback.click = callback;
     this.getElement().querySelector('.film-details__close').addEventListener('click', this._closeButtonClickHandler);
   }
 
+  setWatchListClickHandler(callback) {
+    this._callback.watchListClick = callback;
+    this.getElement().querySelector('.film-details__control-button--watchlist')
+      .addEventListener('click', this._watchListClickHandler);
+  }
+
+  setWatchedClickHandler(callback) {
+    this._callback.watchedClick = callback;
+    this.getElement().querySelector('.film-details__control-button--watched')
+      .addEventListener('click', this._watchedClickHandler);
+  }
+
+  setFavoritesClickHandler(callback) {
+    this._callback.favoritesClick = callback;
+    this.getElement().querySelector('.film-details__control-button--favorite')
+      .addEventListener('click', this._favoritesClickHandler);
+  }
 }

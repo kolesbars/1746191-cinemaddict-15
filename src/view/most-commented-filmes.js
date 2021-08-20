@@ -1,4 +1,4 @@
-import Abstarct from './abstract.js';
+import Abstract from './abstract.js';
 
 const createMostCommentedFilmsTemplate = () => (
   `<section class="films-list films-list--extra">
@@ -8,7 +8,7 @@ const createMostCommentedFilmsTemplate = () => (
     </section>`
 );
 
-export default class MostRatedView extends Abstarct {
+export default class MostCommentedView extends Abstract {
   getTemplate() {
     return createMostCommentedFilmsTemplate();
   }

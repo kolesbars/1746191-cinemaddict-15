@@ -1,5 +1,6 @@
 import dayjs from 'dayjs';
 import {getRandomInteger, getRandomFloat} from '../utils/common.js';
+import {nanoid} from 'nanoid';
 
 const COMMENTED_PERIOD = 730;
 const RELEASE_PERIOD = 100;
@@ -224,6 +225,7 @@ const generateFilmCards = (quantity) => {
   const filmCards = [];
   for (let i = 0; i < quantity; i++) {
     const card = {
+      id: nanoid(),
       poster: generatePoster(),
       name: generateFilmName(),
       description: generateDescription(),

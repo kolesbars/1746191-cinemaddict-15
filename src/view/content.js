@@ -1,4 +1,4 @@
-import Abstarct from './abstract.js';
+import Abstract from './abstract.js';
 
 const createCardContainerTemplate = () => (
   `<section class="films">
@@ -9,7 +9,7 @@ const createCardContainerTemplate = () => (
   </section>`
 );
 
-export default class SiteContent extends Abstarct {
+export default class SiteContent extends Abstract {
   getTemplate() {
     return createCardContainerTemplate();
   }

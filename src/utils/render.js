@@ -1,3 +1,5 @@
+import Abstract from '../view/abstract';
+
 const RenderPosition = {
   BEFOREEND: 'beforeend',
   AFTEREND: 'afterend',
@@ -14,27 +16,6 @@ const renderElement = (container, element, place) => {
   }
 };
 
-const bodyElement = document.querySelector('body');
-
-const renderPopup = (film, popup) => {
-
-  film.setShowPopupClickHandler(() => {
-    const popupElement = bodyElement.querySelector('.film-details');
-
-    if (popupElement) {
-      popupElement.remove();
-    }
-
-    bodyElement.appendChild(popup.getElement());
-    bodyElement.classList.add('hide-overflow');
-  });
-
-  popup.setCloseButtonClickHandler(() => {
-    bodyElement.removeChild(popup.getElement());
-    bodyElement.classList.remove('hide-overflow');
-  });
-};
-
 const createElement = (template) => {
   const newElement = document.createElement('div');
   newElement.innerHTML = template;
@@ -42,4 +23,31 @@ const createElement = (template) => {
   return newElement.firstChild;
 };
 
-export {renderElement, RenderPosition, createElement, renderPopup};
+const replace = (newChild, oldChild) => {
+  if (oldChild instanceof Abstract) {
+    oldChild = oldChild.getElement();
+  }
+
+  if (newChild instanceof Abstract) {
+    newChild = newChild.getElement();
+  }
+
+  const parent = oldChild.parentElement;
+
+  if (parent === null || oldChild === null || newChild === null) {
+    throw new Error('Can\'t replace unexisting elements');
+  }
+
+  parent.replaceChild(newChild, oldChild);
+};
+
+const remove = (component) => {
+  if (!(component instanceof Abstract)) {
+    throw new Error('Can remove only components');
+  }
+
+  component.getElement().remove();
+  component.removeElement();
+};
+
+export {renderElement, RenderPosition, createElement, replace, remove};
