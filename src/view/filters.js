@@ -1,6 +1,6 @@
 import Abstract from './abstract.js';
 
-const createMenuTemplate = (filter) => {
+const createFiltersTemplate = (filter) => {
   const {wathclist, hystory, favorites} = filter;
   return `<nav class="main-navigation">
     <div class="main-navigation__items">
@@ -20,6 +20,6 @@ export default class SiteMenuView extends Abstract {
   }
 
   getTemplate() {
-    return createMenuTemplate(this._filter);
+    return createFiltersTemplate(this._filter);
   }
 }

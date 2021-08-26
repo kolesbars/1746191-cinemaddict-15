@@ -1,10 +1,9 @@
 import CommentView from './comment.js';
 import dayjs from 'dayjs';
-import Abstract from './abstract.js';
-
+import Smart from './smart.js';
 
 const createPopupTemplate = (data) => {
-  const {poster, name, description, date, rating, comments, genre, duration, director, screenwriters, actors, country, age, isInWatchlist, isWatched, isFavorite} = data;
+  const {poster, name, description, date, rating, comments, genre, duration, director, screenwriters, actors, country, age, isInWatchlist, isWatched, isFavorite, emoji, altText, commentText} = data;
 
   const releaseDate = dayjs(date).format('D MMMM YYYY');
 
@@ -36,6 +35,15 @@ const createPopupTemplate = (data) => {
   const favoritesClassName = isFavorite ?
     'film-details__control-button--favorite film-details__control-button--active' :
     'film-details__control-button--favorite';
+
+  const createNewCommentEmoji = (img, text) => `${img ? `<img src="${img}" width="55" height="55" alt="${text ? text : ' '}"></img>` : ' '}`;
+
+  const createCommentText = () => {
+    if(commentText) {
+      return commentText;
+    }
+    return '';
+  };
 
   return `<section class="film-details">
   <form class="film-details__inner" action="" method="get">
@@ -116,10 +124,12 @@ const createPopupTemplate = (data) => {
         </ul>
 
         <div class="film-details__new-comment">
-          <div class="film-details__add-emoji-label"></div>
+          <div class="film-details__add-emoji-label">
+            ${createNewCommentEmoji(emoji, altText)}
+          </div>
 
           <label class="film-details__comment-label">
-            <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment"></textarea>
+            <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${createCommentText()}</textarea>
           </label>
 
           <div class="film-details__emoji-list">
@@ -149,23 +159,61 @@ const createPopupTemplate = (data) => {
   </form>
 </section>`;};
 
-export default class PopupView extends Abstract {
+export default class PopupView extends Smart {
   constructor(popup) {
     super();
-    this._popup = popup;
+    this._data = PopupView.parsePopupToData(popup);
+    this._emojyContainer = this.getElement().querySelector('.film-details__add-emoji-label');
+
     this._closeButtonClickHandler = this._closeButtonClickHandler.bind(this);
     this._watchListClickHandler = this._watchListClickHandler.bind(this);
     this._watchedClickHandler = this._watchedClickHandler.bind(this);
     this._favoritesClickHandler = this._favoritesClickHandler.bind(this);
+    this._smileEmojiClickHandler =  this._smileEmojiClickHandler.bind(this);
+    this._sleepingEmojiClickHandler =  this._sleepingEmojiClickHandler.bind(this);
+    this._pukeEmojiClickHandler =  this._pukeEmojiClickHandler.bind(this);
+    this._angryEmojiClickHandler =  this._angryEmojiClickHandler.bind(this);
+    this._commentTextInputHandler = this._commentTextInputHandler.bind(this);
+    this._formSubmitHandler = this._formSubmitHandler.bind(this);
+
+    this._setInnerHandlers();
+  }
+
+  reset(popup) {
+    this.updateData(
+      PopupView.parsePopupToData(popup),
+    );
   }
 
   getTemplate() {
-    return createPopupTemplate(this._popup);
+    return createPopupTemplate(this._data);
+  }
+
+  restoreHandlers() {
+    this._setInnerHandlers();
+    this.setCloseButtonClickHandler(this._callback.click);
+    this.setWatchListClickHandler(this._callback.watchListClick);
+    this.setWatchedClickHandler(this._callback.watchedClick);
+    this.setFavoritesClickHandler(this._callback.favoritesClick);
+  }
+
+  _setInnerHandlers() {
+    this.getElement().querySelector('#emoji-smile')
+      .addEventListener('click', this._smileEmojiClickHandler);
+    this.getElement().querySelector('#emoji-sleeping')
+      .addEventListener('click', this._sleepingEmojiClickHandler);
+    this.getElement().querySelector('#emoji-puke')
+      .addEventListener('click', this._pukeEmojiClickHandler);
+    this.getElement().querySelector('#emoji-angry')
+      .addEventListener('click', this._angryEmojiClickHandler);
+    this.getElement().querySelector('.film-details__comment-input')
+      .addEventListener('input', this._commentTextInputHandler);
   }
 
   _closeButtonClickHandler(evt) {
     evt.preventDefault();
     this._callback.click();
+    this.reset(this._popup);
   }
 
   _watchListClickHandler(evt) {
@@ -181,6 +229,55 @@ export default class PopupView extends Abstract {
   _favoritesClickHandler(evt) {
     evt.preventDefault();
     this._callback.favoritesClick();
+  }
+
+  _smileEmojiClickHandler(evt) {
+    evt.preventDefault();
+    this.updateData({
+      emoji: 'images/emoji/smile.png',
+      altText: 'emoji-smile',
+    });
+  }
+
+  _sleepingEmojiClickHandler(evt) {
+    evt.preventDefault();
+    this.updateData({
+      emoji: 'images/emoji/sleeping.png',
+      altText: 'emoji-sleeping',
+    });
+  }
+
+  _pukeEmojiClickHandler(evt) {
+    evt.preventDefault();
+    this.updateData({
+      emoji: 'images/emoji/puke.png',
+      altText: 'emoji-puke',
+    });
+  }
+
+  _angryEmojiClickHandler(evt) {
+    evt.preventDefault();
+    this.updateData({
+      emoji: 'images/emoji/angry.png',
+      altText: 'emoji-angry',
+    });
+  }
+
+  _commentTextInputHandler(evt) {
+    evt.preventDefault();
+    this.updateData({
+      commentText: evt.target.value,
+    }, true);
+  }
+
+  _formSubmitHandler(evt) {
+    evt.preventDefault();
+    this._callback.formSubmit(PopupView.parseDataToTask(this._data));
+  }
+
+  setFormSubmitHandler(callback) {
+    this._callback.formSubmit = callback;
+    this.getElement().querySelector('form').addEventListener('submit', this._formSubmitHandler);
   }
 
   setCloseButtonClickHandler(callback) {
@@ -205,4 +302,30 @@ export default class PopupView extends Abstract {
     this.getElement().querySelector('.film-details__control-button--favorite')
       .addEventListener('click', this._favoritesClickHandler);
   }
+
+  static parsePopupToData(popup) {
+    return Object.assign(
+      {},
+      popup,
+      {
+        emoji: '',
+        altText: '',
+        commentText: '',
+      },
+    );
+  }
+
+  static parseDataToPopup(data) {
+    data = Object.assign(
+      {},
+      data,
+    );
+
+    delete data.emoji;
+    delete data.altText;
+    delete data.commentText;
+
+    return data;
+  }
+
 }

@@ -47,8 +47,9 @@ export default class Movie {
     }
 
     if (this._bodyElement.contains(prevPopupComponent.getElement())) {
-      replace(this._popupComponent, prevPopupComponent);
+      const scrollHeigt = prevPopupComponent.getElement().scrollTop;
       this._bodyElement.appendChild(this._popupComponent.getElement());
+      this._popupComponent.getElement().scrollTop = scrollHeigt;
       this._bodyElement.classList.add('hide-overflow');
     }
 
@@ -60,6 +61,7 @@ export default class Movie {
 
     film.setShowPopupClickHandler(() => {
       this._hidePopup();
+      popup.reset(this._film);
       this._bodyElement.appendChild(popup.getElement());
       this._bodyElement.classList.add('hide-overflow');
     });
@@ -67,6 +69,7 @@ export default class Movie {
     popup.setCloseButtonClickHandler(() => {
       this._bodyElement.removeChild(popup.getElement());
       this._bodyElement.classList.remove('hide-overflow');
+      popup.reset(this._film);
     });
 
   }

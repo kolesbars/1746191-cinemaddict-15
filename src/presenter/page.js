@@ -1,12 +1,11 @@
 import RatingView from '../view/profile-rating.js';
-import SiteMenuView from '../view/menu.js';
+import SiteFiltersView from '../view/filters.js';
 import SortingView from '../view/sorting.js';
 import SiteContent from '../view/content.js';
 import FilmQuantityView from '../view/films-quantity.js';
 import ShowMoreView from '../view/show-more-button.js';
 import TopFilmsView from '../view/top-rated-films.js';
 import MostCommentedView from '../view/most-commented-filmes';
-import {filters} from '../main.js';
 import {renderElement, RenderPosition, remove} from '../utils/render.js';
 import {updateItem} from '../utils/common.js';
 import Movie from './movie.js';
@@ -14,7 +13,7 @@ import Movie from './movie.js';
 const FILM_COUNT_PER_STEP = 5;
 const EXTRA_FILMS_COUNT = 2;
 
-export default class MovieList {
+export default class PagePresenter {
   constructor(headerContainer, mainContainer, footerContainer) {
     this._headerContainer = headerContainer;
     this._mainContainer = mainContainer;
@@ -23,20 +22,19 @@ export default class MovieList {
     this._filmPresenter = new Map;
 
     this._ratingComponent = new RatingView();
-    this._menuComponent = new SiteMenuView(filters);
     this._sortingComponent = new SortingView();
     this._contentComponent = new SiteContent();
     this._filmQuantityComponent = new FilmQuantityView();
     this._showMoreComponent = new ShowMoreView();
     this._topFilmsComponent = new TopFilmsView();
     this._mostCommentedFilmsComponent = new MostCommentedView();
-
     this._handleFilmChange = this._handleFilmChange.bind(this);
     this._handleShowMoreButtonClick = this._handleShowMoreButtonClick.bind(this);
   }
 
-  init(filmsData) {
+  init(filmsData, filters) {
     this._filmsData = filmsData.slice();
+    this._filtersComponent = new SiteFiltersView(filters);
 
     this._renderSite();
   }
@@ -50,8 +48,8 @@ export default class MovieList {
     renderElement( this._headerContainer, this._ratingComponent.getElement(), RenderPosition.BEFOREEND);
   }
 
-  _renderMenu() {
-    renderElement(this._mainContainer, this._menuComponent.getElement(), RenderPosition.BEFOREEND);
+  _renderFilters() {
+    renderElement(this._mainContainer, this._filtersComponent.getElement(), RenderPosition.BEFOREEND);
   }
 
   _renderContent() {
@@ -138,7 +136,7 @@ export default class MovieList {
 
   _renderSite() {
     this._renderRating();
-    this._renderMenu();
+    this._renderFilters();
     this._renderSort();
     this._renderContent();
     this._renderFilmsQuntity();
