@@ -206,6 +206,7 @@ const generateCountry = () => {
 };
 
 const generateComment = () => ({
+  id: nanoid(),
   emoji: generateEmoji(),
   author: generateAuthor(),
   text: generateCommentText(),

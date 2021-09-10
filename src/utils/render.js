@@ -1,19 +1,7 @@
 import Abstract from '../view/abstract';
 
-const RenderPosition = {
-  BEFOREEND: 'beforeend',
-  AFTEREND: 'afterend',
-};
-
-const renderElement = (container, element, place) => {
-  switch (place) {
-    case RenderPosition.BEFOREEND:
-      container.append(element);
-      break;
-    case RenderPosition.AFTEREND:
-      container.after(element);
-      break;
-  }
+const renderElement = (container, element) => {
+  container.append(element);
 };
 
 const createElement = (template) => {
@@ -42,6 +30,10 @@ const replace = (newChild, oldChild) => {
 };
 
 const remove = (component) => {
+  if (component === null) {
+    return;
+  }
+
   if (!(component instanceof Abstract)) {
     throw new Error('Can remove only components');
   }
@@ -50,4 +42,4 @@ const remove = (component) => {
   component.removeElement();
 };
 
-export {renderElement, RenderPosition, createElement, replace, remove};
+export {renderElement, createElement, replace, remove};
