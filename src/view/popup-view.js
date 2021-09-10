@@ -1,6 +1,8 @@
 import CommentView from './comment.js';
 import dayjs from 'dayjs';
 import Smart from './smart.js';
+import {nanoid} from 'nanoid';
+import he from 'he';
 
 const createPopupTemplate = (data) => {
   const {poster, name, description, date, rating, comments, genre, duration, director, screenwriters, actors, country, age, isInWatchlist, isWatched, isFavorite, emoji, altText, commentText} = data;
@@ -23,7 +25,7 @@ const createPopupTemplate = (data) => {
   for (let i = 0; i < commentsCount; i++) {
     commentsArray.push(new CommentView(comments[i]).getTemplate());
   }
-  const commentElements = commentsArray.join();
+  const commentElements = commentsArray.join('');
 
   const inWatcheListClassName =  isInWatchlist ?
     'film-details__control-button--watchlist film-details__control-button--active' : 'film-details__control-button--watchlist';
@@ -36,7 +38,7 @@ const createPopupTemplate = (data) => {
     'film-details__control-button--favorite film-details__control-button--active' :
     'film-details__control-button--favorite';
 
-  const createNewCommentEmoji = (img, text) => `${img ? `<img src="${img}" width="55" height="55" alt="${text ? text : ' '}"></img>` : ' '}`;
+  const createNewCommentEmoji = (img, text) => `${img ? `<img src="./images/emoji/${img}" width="55" height="55" alt="${text ? text : ' '}"></img>` : ' '}`;
 
   const createCommentText = () => {
     if(commentText) {
@@ -129,7 +131,7 @@ const createPopupTemplate = (data) => {
           </div>
 
           <label class="film-details__comment-label">
-            <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${createCommentText()}</textarea>
+            <textarea class="film-details__comment-input" pattern="[a-zA-Z0-9]" placeholder="Select reaction below and write comment here" name="comment">${he.encode(createCommentText())}</textarea>
           </label>
 
           <div class="film-details__emoji-list">
@@ -162,7 +164,13 @@ const createPopupTemplate = (data) => {
 export default class PopupView extends Smart {
   constructor(popup) {
     super();
-    this._data = PopupView.parsePopupToData(popup);
+    this._popup = popup;
+    this._data = {
+      emoji: '',
+      altText: '',
+      commentText: '',
+    };
+
     this._emojyContainer = this.getElement().querySelector('.film-details__add-emoji-label');
 
     this._closeButtonClickHandler = this._closeButtonClickHandler.bind(this);
@@ -174,27 +182,32 @@ export default class PopupView extends Smart {
     this._pukeEmojiClickHandler =  this._pukeEmojiClickHandler.bind(this);
     this._angryEmojiClickHandler =  this._angryEmojiClickHandler.bind(this);
     this._commentTextInputHandler = this._commentTextInputHandler.bind(this);
-    this._formSubmitHandler = this._formSubmitHandler.bind(this);
+    this._commentInputKeydownHandler = this._commentInputKeydownHandler.bind(this);
+    this._commentDeleteClickHandler = this._commentDeleteClickHandler.bind(this);
 
     this._setInnerHandlers();
   }
 
-  reset(popup) {
-    this.updateData(
-      PopupView.parsePopupToData(popup),
-    );
+  reset() {
+    this.updateData({
+      emoji: '',
+      altText: '',
+      commentText: '',
+    });
   }
 
   getTemplate() {
-    return createPopupTemplate(this._data);
+    return createPopupTemplate(this._parsePopupToData(this._popup));
   }
 
   restoreHandlers() {
     this._setInnerHandlers();
-    this.setCloseButtonClickHandler(this._callback.click);
-    this.setWatchListClickHandler(this._callback.watchListClick);
-    this.setWatchedClickHandler(this._callback.watchedClick);
-    this.setFavoritesClickHandler(this._callback.favoritesClick);
+    this.setCloseButtonClickHandler(this._callbacks.closePopup);
+    this.setWatchListClickHandler(this._callbacks.watchListClick);
+    this.setWatchedClickHandler(this._callbacks.watchedClick);
+    this.setFavoritesClickHandler(this._callbacks.favoritesClick);
+    this.setDeleteCommentClickHandler(this._callbacks.deleteComment);
+    this.setAddNewCommentHandler(this._callbacks.addComment);
   }
 
   _setInnerHandlers() {
@@ -212,29 +225,29 @@ export default class PopupView extends Smart {
 
   _closeButtonClickHandler(evt) {
     evt.preventDefault();
-    this._callback.click();
-    this.reset(this._popup);
+    this._callbacks.closePopup();
+    this.reset();
   }
 
   _watchListClickHandler(evt) {
     evt.preventDefault();
-    this._callback.watchListClick();
+    this._callbacks.watchListClick();
   }
 
   _watchedClickHandler(evt) {
     evt.preventDefault();
-    this._callback.watchedClick();
+    this._callbacks.watchedClick();
   }
 
   _favoritesClickHandler(evt) {
     evt.preventDefault();
-    this._callback.favoritesClick();
+    this._callbacks.favoritesClick();
   }
 
   _smileEmojiClickHandler(evt) {
     evt.preventDefault();
     this.updateData({
-      emoji: 'images/emoji/smile.png',
+      emoji: 'smile.png',
       altText: 'emoji-smile',
     });
   }
@@ -242,7 +255,7 @@ export default class PopupView extends Smart {
   _sleepingEmojiClickHandler(evt) {
     evt.preventDefault();
     this.updateData({
-      emoji: 'images/emoji/sleeping.png',
+      emoji: 'sleeping.png',
       altText: 'emoji-sleeping',
     });
   }
@@ -250,7 +263,7 @@ export default class PopupView extends Smart {
   _pukeEmojiClickHandler(evt) {
     evt.preventDefault();
     this.updateData({
-      emoji: 'images/emoji/puke.png',
+      emoji: 'puke.png',
       altText: 'emoji-puke',
     });
   }
@@ -258,7 +271,7 @@ export default class PopupView extends Smart {
   _angryEmojiClickHandler(evt) {
     evt.preventDefault();
     this.updateData({
-      emoji: 'images/emoji/angry.png',
+      emoji: 'angry.png',
       altText: 'emoji-angry',
     });
   }
@@ -270,62 +283,73 @@ export default class PopupView extends Smart {
     }, true);
   }
 
-  _formSubmitHandler(evt) {
-    evt.preventDefault();
-    this._callback.formSubmit(PopupView.parseDataToTask(this._data));
+  _getNewComment() {
+    return {
+      id: nanoid(),
+      emoji: this._parsePopupToData(this._popup).emoji,
+      author: 'You',
+      text: this._parsePopupToData(this._popup).commentText,
+      date: dayjs().add(7, 'day').toDate(),
+    };
   }
 
-  setFormSubmitHandler(callback) {
-    this._callback.formSubmit = callback;
-    this.getElement().querySelector('form').addEventListener('submit', this._formSubmitHandler);
+  _commentDeleteClickHandler(evt) {
+    evt.preventDefault();
+    this._callbacks.deleteComment(evt.target.closest('.film-details__comment').id);
+  }
+
+  setAddNewCommentHandler(callback) {
+    this._callbacks.addComment = callback;
+
+    this.getElement()
+      .querySelector('.film-details__comment-input')
+      .addEventListener('keydown', this._commentInputKeydownHandler);
+  }
+
+  _commentInputKeydownHandler(evt) {
+    if (evt.key === 'Enter' && evt.ctrlKey) {
+      evt.preventDefault();
+      this._callbacks.addComment(this._getNewComment());
+    }
+  }
+
+  setDeleteCommentClickHandler(callback) {
+    this._callbacks.deleteComment = callback;
+    const deleteButtons = this.getElement().querySelectorAll('.film-details__comment-delete');
+    if (deleteButtons) {
+      deleteButtons.forEach((button) => button.addEventListener('click', this._commentDeleteClickHandler));
+    }
   }
 
   setCloseButtonClickHandler(callback) {
-    this._callback.click = callback;
+    this._callbacks.closePopup = callback;
     this.getElement().querySelector('.film-details__close').addEventListener('click', this._closeButtonClickHandler);
   }
 
   setWatchListClickHandler(callback) {
-    this._callback.watchListClick = callback;
+    this._callbacks.watchListClick = callback;
     this.getElement().querySelector('.film-details__control-button--watchlist')
       .addEventListener('click', this._watchListClickHandler);
   }
 
   setWatchedClickHandler(callback) {
-    this._callback.watchedClick = callback;
+    this._callbacks.watchedClick = callback;
     this.getElement().querySelector('.film-details__control-button--watched')
       .addEventListener('click', this._watchedClickHandler);
   }
 
   setFavoritesClickHandler(callback) {
-    this._callback.favoritesClick = callback;
+    this._callbacks.favoritesClick = callback;
     this.getElement().querySelector('.film-details__control-button--favorite')
       .addEventListener('click', this._favoritesClickHandler);
   }
 
-  static parsePopupToData(popup) {
+  _parsePopupToData(popup) {
     return Object.assign(
       {},
       popup,
-      {
-        emoji: '',
-        altText: '',
-        commentText: '',
-      },
+      this._data,
     );
-  }
-
-  static parseDataToPopup(data) {
-    data = Object.assign(
-      {},
-      data,
-    );
-
-    delete data.emoji;
-    delete data.altText;
-    delete data.commentText;
-
-    return data;
   }
 
 }
