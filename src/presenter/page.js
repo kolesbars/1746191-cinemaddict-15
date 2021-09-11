@@ -7,9 +7,9 @@ import TopFilmsView from '../view/top-rated-films.js';
 import MostCommentedView from '../view/most-commented-filmes';
 import {renderElement, remove} from '../utils/render.js';
 import Movie from './movie.js';
-import {UpdateType} from '../const.js';
+import {UpdateType, FilterType} from '../const.js';
 import {filter} from '../utils/filters.js';
-
+import NoFilms from '../view/no-films.js';
 
 const FILM_COUNT_PER_STEP = 5;
 //const EXTRA_FILMS_COUNT = 2;
@@ -23,8 +23,10 @@ export default class PagePresenter {
     this._filterModel = filterModel;
     this._renderedFilmCount = FILM_COUNT_PER_STEP;
     this._filmPresenters = new Map;
+    this._filterType = FilterType.ALL;
 
     this._showMoreComponent = null;
+    this._noFilmComponent = null;
 
     this._ratingComponent = new RatingView();
     this._sortingComponent = new SortingView();
@@ -32,7 +34,6 @@ export default class PagePresenter {
     this._filmQuantityComponent = new FilmQuantityView();
     this._topFilmsComponent = new TopFilmsView();
     this._mostCommentedFilmsComponent = new MostCommentedView();
-    //this._handleFilmChange = this._handleFilmChange.bind(this);
     this._handleViewAction = this._handleViewAction.bind(this);
     this._handleModelEvent = this._handleModelEvent.bind(this);
     this._handleShowMoreButtonClick = this._handleShowMoreButtonClick.bind(this);
@@ -46,9 +47,9 @@ export default class PagePresenter {
   }
 
   _getFilms() {
-    const filterType = this._filterModel.getFilter();
+    this._filterType = this._filterModel.getFilter();
     const films = this._moviesModel.getMovies();
-    const filtredFilms = filter[filterType](films);
+    const filtredFilms = filter[this._filterType](films);
     return filtredFilms;
   }
 
@@ -95,6 +96,11 @@ export default class PagePresenter {
 
   _renderFilmsQuntity() {
     renderElement(this._footerContainer, this._filmQuantityComponent.getElement());
+  }
+
+  _renderNoFilms() {
+    this._noFilmComponent = new NoFilms(this._filterType);
+    renderElement(this._contentComponent.getElement(), this._noFilmComponent.getElement());
   }
 
   _renderFilm(film, container) {
@@ -162,6 +168,10 @@ export default class PagePresenter {
 
     remove(this._showMoreComponent);
 
+    if(this._noFilmComponent) {
+      remove(this._noFilmComponent);
+    }
+
     if (resetRenderedFilmCount) {
       this._renderedFilmCount = FILM_COUNT_PER_STEP;
     } else {
@@ -187,6 +197,10 @@ export default class PagePresenter {
     this._renderFilmsQuntity();
     //this._renderTopFilmsList();
     //this._renderMostCommentedFilmsList();
+    if(filmsCount === 0) {
+      this._renderNoFilms();
+      return;
+    }
 
     this._renderFilms(films.slice(0, Math.min(filmsCount, this._renderedFilmCount)));
 

@@ -21,6 +21,7 @@ export default class Movie {
     this._handlePopupFavorites = this._handlePopupFavorites.bind(this);
     this._handleDeleteComment = this._handleDeleteComment.bind(this);
     this._handleAddComment = this._handleAddComment.bind(this);
+    this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
   }
 
   init(film, isShowUpdatePopup) {
@@ -72,18 +73,26 @@ export default class Movie {
       popup.reset(this._film);
       this._bodyElement.appendChild(popup.getElement());
       this._bodyElement.classList.add('hide-overflow');
+      document.addEventListener('keydown', this._escKeyDownHandler);
     });
 
     popup.setCloseButtonClickHandler(() => {
-      this._bodyElement.removeChild(popup.getElement());
+      remove(popup);
       this._bodyElement.classList.remove('hide-overflow');
-      popup.reset(this._film);
+      document.removeEventListener('keydown', this._escKeyDownHandler);
     });
   }
 
   destroy() {
     remove(this._filmCardComponent);
     remove(this._popupComponent);
+  }
+
+  _escKeyDownHandler(evt) {
+    if (evt.key === 'Escape' || evt.key === 'Esc') {
+      remove(this._popupComponent);
+      this._bodyElement.classList.remove('hide-overflow');
+    }
   }
 
   _handlePopupWatcheList() {
