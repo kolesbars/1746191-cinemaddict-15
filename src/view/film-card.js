@@ -1,10 +1,12 @@
 import dayjs from 'dayjs';
 import Abstract from './abstract.js';
+import {getTimeFromMins} from '../utils/common.js';
 
 const createCardTemplate = (data) => {
   const {poster, name, description, rating, comments, date, genre, duration, isInWatchlist, isWatched, isFavorite} = data;
 
-  const releaseDate = dayjs(date).format('YYYY');
+  const filmDuration = getTimeFromMins(duration);
+  const releaseDate = dayjs(date).format('DD MMMM YYYY');
 
   const inWatcheListClassName =  isInWatchlist ?
     'film-card__controls-item--add-to-watchlist film-card__controls-item--active' : 'film-card__controls-item--add-to-watchlist';
@@ -22,7 +24,7 @@ const createCardTemplate = (data) => {
           <p class="film-card__rating">${rating}</p>
           <p class="film-card__info">
             <span class="film-card__year">${releaseDate}</span>
-            <span class="film-card__duration">${duration}</span>
+            <span class="film-card__duration">${filmDuration}</span>
             <span class="film-card__genre">${genre[0]}</span>
           </p>
           <img src="./images/posters/${poster}" alt="${name}" class="film-card__poster">

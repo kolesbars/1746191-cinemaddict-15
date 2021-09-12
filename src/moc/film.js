@@ -4,6 +4,9 @@ import {nanoid} from 'nanoid';
 
 const COMMENTED_PERIOD = 730;
 const RELEASE_PERIOD = 100;
+// eslint-disable-next-line
+const duration = require('dayjs/plugin/duration');
+dayjs.extend(duration);
 
 const generatePoster = () => {
   const posters = [
@@ -125,14 +128,7 @@ const generateReleaseDate = () => {
   return releaseDate;
 };
 
-const generateDuration = () => {
-  const hours = getRandomInteger(0, 3);
-  const minutes = getRandomInteger(0, 60);
-  if (hours === 0) {
-    return `${minutes}m`;
-  }
-  return `${hours}h ${minutes}m`;
-};
+const generateDuration = () => getRandomInteger(0, 240);
 
 const generateDirector = () => {
   const directors = [
