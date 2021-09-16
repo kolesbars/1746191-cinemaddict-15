@@ -68,4 +68,19 @@ const sortByComments = (filmA, filmB) => {
   return filmB.comments.length - filmA.comments.length;
 };
 
-export {getRandomInteger, getRandomFloat, sortByDate, sortByRating, sortByComments, getTimeFromMins};
+const getProfileRating = (elements) => {
+  if(elements >= 1 && elements < 10) {
+    return 'novice';
+  }
+  if (elements >= 10 && elements < 20) {
+    return 'fan';
+  }
+  if (elements >= 21) {
+    return 'movie buf';
+  }
+  if (elements === 0){
+    return '';
+  }
+};
+
+export {getRandomInteger, getRandomFloat, sortByDate, sortByRating, sortByComments, getTimeFromMins, getProfileRating};

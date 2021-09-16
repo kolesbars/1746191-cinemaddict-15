@@ -13,17 +13,16 @@ export default class FilterPresenter {
 
     this._handleModelEvent = this._handleModelEvent.bind(this);
     this._handleFilterTypeChange = this._handleFilterTypeChange.bind(this);
-
-    this._moviesModel.addObserver(this._handleModelEvent);
-    this._filterModel.addObserver(this._handleModelEvent);
   }
 
-  init() {
+  init(callback) {
     const filters = this._getFilters();
+    this._callback = callback;
     const prevFilterComponent = this._filterComponent;
 
     this._filterComponent = new SiteFiltersView(filters, this._filterModel.getFilter());
     this._filterComponent.setFilterTypeChangeHandler(this._handleFilterTypeChange);
+    this._filterComponent.setMenuItemsClickHandler(this._callback);
 
     if (prevFilterComponent === null) {
       renderElement(this._filterContainer, this._filterComponent.getElement());
@@ -32,6 +31,9 @@ export default class FilterPresenter {
 
     replace(this._filterComponent, prevFilterComponent);
     remove(prevFilterComponent);
+
+    this._filterModel.addObserver(this._handleModelEvent);
+    this._moviesModel.addObserver(this._handleModelEvent);
   }
 
   _handleModelEvent() {
@@ -42,7 +44,6 @@ export default class FilterPresenter {
     if (this._filterModel.getFilter() === filterType) {
       return;
     }
-
     this._filterModel.setFilter(UpdateType.FILTER, filterType);
   }
 

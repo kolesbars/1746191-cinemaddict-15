@@ -3,10 +3,8 @@ import {getRandomInteger, getRandomFloat} from '../utils/common.js';
 import {nanoid} from 'nanoid';
 
 const COMMENTED_PERIOD = 730;
-const RELEASE_PERIOD = 100;
-// eslint-disable-next-line
-const duration = require('dayjs/plugin/duration');
-dayjs.extend(duration);
+const RELEASE_PERIOD = 36500;
+const WATCHING_PERIOD = 30;
 
 const generatePoster = () => {
   const posters = [
@@ -124,8 +122,14 @@ const generateCommentDate = () => {
 
 const generateReleaseDate = () => {
   const yearsGap = getRandomInteger(0, RELEASE_PERIOD);
-  const releaseDate = dayjs().subtract(yearsGap, 'year').toDate();
+  const releaseDate = dayjs().subtract(yearsGap, 'day').toDate();
   return releaseDate;
+};
+
+const generateWatchingDate = () => {
+  const yearsGap = getRandomInteger(0, WATCHING_PERIOD);
+  const watchingDate = dayjs().subtract(yearsGap, 'day').toDate();
+  return watchingDate;
 };
 
 const generateDuration = () => getRandomInteger(0, 240);
@@ -233,6 +237,7 @@ const generateFilmCards = (quantity) => {
       duration: generateDuration(),
       isInWatchlist: Boolean(getRandomInteger(0, 1)),
       isWatched: Boolean(getRandomInteger(0, 1)),
+      watchingDate: generateWatchingDate(),
       isFavorite: Boolean(getRandomInteger(0, 1)),
       director: generateDirector(),
       screenwriters: generateScreenwriters(),

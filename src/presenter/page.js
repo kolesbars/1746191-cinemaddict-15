@@ -5,12 +5,13 @@ import FilmQuantityView from '../view/films-quantity.js';
 import ShowMoreView from '../view/show-more-button.js';
 import TopFilmsView from '../view/top-rated-films.js';
 import MostCommentedView from '../view/most-commented-filmes';
+import NoFilms from '../view/no-films.js';
+import StatsButtonView from '../view/stats-button.js';
 import {renderElement, remove} from '../utils/render.js';
 import {sortByDate, sortByRating, sortByComments} from '../utils/common.js';
 import {filter} from '../utils/filters.js';
 import Movie from './movie.js';
 import {UpdateType, FilterType} from '../const.js';
-import NoFilms from '../view/no-films.js';
 import {SortType} from '../const.js';
 
 const FILM_COUNT_PER_STEP = 5;
@@ -31,22 +32,32 @@ export default class PagePresenter {
     this._noFilmComponent = null;
     this._sortingComponent = null;
 
-    this._ratingComponent = new RatingView();
+    this._ratingComponent = new RatingView(moviesModel.getMovies());
     this._contentComponent = new SiteContent();
     this._filmQuantityComponent = new FilmQuantityView();
     this._topFilmsComponent = new TopFilmsView();
     this._mostCommentedFilmsComponent = new MostCommentedView();
+    this._statsButtonComponent = new StatsButtonView();
+
     this._handleViewAction = this._handleViewAction.bind(this);
     this._handleModelEvent = this._handleModelEvent.bind(this);
     this._handleShowMoreButtonClick = this._handleShowMoreButtonClick.bind(this);
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
 
-    this._moviesModel.addObserver(this._handleModelEvent);
-    this._filterModel.addObserver(this._handleModelEvent);
   }
 
   init() {
     this._renderPage();
+
+    this._moviesModel.addObserver(this._handleModelEvent);
+    this._filterModel.addObserver(this._handleModelEvent);
+  }
+
+  _destroy() {
+    this._clearPage({resetRenderedFilmCount: true, resetSortType: true});
+
+    this._moviesModel.removeObserver(this._handleModelEvent);
+    this._filterModel.removeObserver(this._handleModelEvent);
   }
 
   _getFilms() {
@@ -112,10 +123,6 @@ export default class PagePresenter {
 
   _renderRating() {
     renderElement( this._headerContainer, this._ratingComponent.getElement());
-  }
-
-  _renderMenu() {
-    renderElement(this._mainContainer, this._menuComponent.getElement());
   }
 
   _renderContent() {
@@ -226,12 +233,14 @@ export default class PagePresenter {
     this._renderSort();
     this._renderContent();
     this._renderFilmsQuntity();
-    this._renderTopFilmsList();
-    this._renderMostCommentedFilmsList();
+
     if(filmsCount === 0) {
       this._renderNoFilms();
       return;
     }
+
+    this._renderTopFilmsList();
+    this._renderMostCommentedFilmsList();
 
     this._renderFilms(films.slice(0, Math.min(filmsCount, this._renderedFilmCount)));
 

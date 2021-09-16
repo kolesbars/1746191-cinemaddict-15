@@ -131,7 +131,7 @@ const createPopupTemplate = (data) => {
           </div>
 
           <label class="film-details__comment-label">
-            <textarea class="film-details__comment-input" pattern="[a-zA-Z0-9]" placeholder="Select reaction below and write comment here" name="comment">${he.encode(createCommentText())}</textarea>
+            <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${he.encode(createCommentText())}</textarea>
           </label>
 
           <div class="film-details__emoji-list">
