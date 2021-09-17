@@ -100,7 +100,7 @@ const createStatsTemplate = (data) => {
     return '';
   };
 
-  return `<section class="statistic hidden">
+  return `<section class="statistic">
     <p class="statistic__rank">
       Your rank
       <img class="statistic__img" src="images/bitmap@2x.png" alt="Avatar" width="35" height="35">
@@ -110,7 +110,7 @@ const createStatsTemplate = (data) => {
     <form action="https://echo.htmlacademy.ru/" method="get" class="statistic__filters">
       <p class="statistic__filters-description">Show stats:</p>
 
-      <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-all-time" value="all-time" checked>
+      <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-all-time" value="all-time">
       <label for="statistic-all-time" class="statistic__filters-label">All time</label>
 
       <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-today" value="today">
@@ -155,10 +155,11 @@ export default class StatsView extends Smart {
     this._data = {
       films: this._films,
       dateFrom: (() => {
-        const defaultDateFrom = 40000;
+        const defaultDateFrom = StatsRanges.ALL_TIME;
         return dayjs().subtract(defaultDateFrom, 'day').toDate();
       })(),
       dateTo: dayjs().toDate(),
+      check: 'all-time',
     };
 
     this._statisticChart = null;
@@ -183,7 +184,8 @@ export default class StatsView extends Smart {
   }
 
   _rangeChangeHandler(evt) {
-    const dateFrom = this._getStatsRange(evt);
+    const data = new FormData(evt.currentTarget);
+    const dateFrom = this._getStatsRange(data.get('statistic-filter'));
     if (!dateFrom) {
       return;
     }
@@ -193,16 +195,14 @@ export default class StatsView extends Smart {
         dateFrom: dayjs().toDate(),
       });
     }
-
     this.updateData({
       dateFrom: (() => dayjs().subtract(dateFrom, 'day').toDate())(),
+      check: evt.target.value,
     });
   }
 
-  _getStatsRange(evt) {
-    evt.preventDefault();
-
-    switch (evt.target.value) {
+  _getStatsRange(value) {
+    switch (value) {
       case 'today':
         return StatsRanges.TODAY;
       case 'week':
@@ -220,7 +220,11 @@ export default class StatsView extends Smart {
     if (this._statisticChart !== null) {
       this._statisticChart = null;
     }
-    const {films, dateFrom, dateTo} = this._data;
+    const {films, dateFrom, dateTo, check} = this._data;
+
+    Array.from(this.getElement().querySelector('.statistic__filters').children)
+      .find((child) => child.value === check).checked = true;
+
     const filmsInRange = getFilmsInRange(dateFrom, dateTo, films);
 
     const statisticCtx = this.getElement().querySelector('.statistic__chart');

@@ -22,15 +22,17 @@ const statisticsContainer = footerContainer.querySelector('.footer__statistics')
 
 
 const pagePresenter = new PagePresenter(headerContainer, mainContainer, statisticsContainer, moviesModel, filterModel);
-const filterPresenter = new FilterPresenter(mainContainer, filterModel, moviesModel);
 
 const handleMenuItemsClick = (type) => {
   if(type === 'stats') {
-    pagePresenter._destroy();
+    pagePresenter.destroy();
     statsComponent = new StatsView(moviesModel.getMovies());
     renderElement(mainContainer, statsComponent.getElement());
     mainContainer.querySelector('.main-navigation__additional')
       .classList.add('main-navigation__item--active');
+    mainContainer.querySelectorAll('.main-navigation__item').forEach((item) => {
+      item.classList.remove('main-navigation__item--active');
+    });
   } else {
     if (mainContainer.lastChild === statsComponent.getElement()) {
       remove(statsComponent);
@@ -42,6 +44,8 @@ const handleMenuItemsClick = (type) => {
   }
 };
 
-filterPresenter.init(handleMenuItemsClick);
+const filterPresenter = new FilterPresenter(mainContainer, filterModel, moviesModel, handleMenuItemsClick);
+
+filterPresenter.init();
 pagePresenter.init();
 

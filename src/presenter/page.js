@@ -53,7 +53,7 @@ export default class PagePresenter {
     this._filterModel.addObserver(this._handleModelEvent);
   }
 
-  _destroy() {
+  destroy() {
     this._clearPage({resetRenderedFilmCount: true, resetSortType: true});
 
     this._moviesModel.removeObserver(this._handleModelEvent);

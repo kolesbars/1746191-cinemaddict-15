@@ -17,7 +17,7 @@ const createFilterItemTemplate = (filter, currentFilterType) => {
     }
   };
 
-  return `<a href="#${type}" class="main-navigation__item ${type === currentFilterType ? 'main-navigation__item--active' : ''}" value="${type}" data-menu-item="${type}">${filterTytle(type)} ${type !== 'all' ? `<span class="main-navigation__item-count">${count}</span>` : ''}</a>`;
+  return `<a href="#${type}" class="main-navigation__item ${type === currentFilterType ? 'main-navigation__item--active' : ''}" data-menu-item="${type}">${filterTytle(type)} ${type !== 'all' ? `<span class="main-navigation__item-count">${count}</span>` : ''}</a>`;
 };
 
 const statsButton = new StatsButtonView().getTemplate();
@@ -52,13 +52,17 @@ export default class SiteFiltersView extends Abstract {
   }
 
   _filterTypeChangeHandler(evt) {
+    if (evt.target.tagName !== 'A') {
+      return;
+    }
+
     evt.preventDefault();
-    this._callbacks.filterTypeChange(evt.target.getAttribute('value'));
+    this._callbacks.filterTypeChange(evt.target.dataset.menuItem);
   }
 
   setFilterTypeChangeHandler(callback) {
     this._callbacks.filterTypeChange = callback;
-    this.getElement().querySelectorAll('.main-navigation__item').forEach((element) => element.addEventListener('click', this._filterTypeChangeHandler));
+    this.getElement().querySelectorAll('.main-navigation__items').forEach((element) => element.addEventListener('click', this._filterTypeChangeHandler));
   }
 
   _menuItemsClickHandler(evt) {
@@ -66,11 +70,11 @@ export default class SiteFiltersView extends Abstract {
       return;
     }
     evt.preventDefault();
-    this._callbacks.statsClick(evt.target.dataset.menuItem);
+    this._callbacks.menuItemClick(evt.target.dataset.menuItem);
   }
 
   setMenuItemsClickHandler(callback) {
-    this._callbacks.statsClick = callback;
+    this._callbacks.menuItemClick = callback;
     this.getElement()
       .addEventListener('click', this._menuItemsClickHandler);
   }
