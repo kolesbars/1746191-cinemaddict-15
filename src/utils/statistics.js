@@ -14,7 +14,7 @@ const makeItemsUniq = (items) => {
 };
 
 const countFilmsByGenre = (films, genre) =>
-  films.filter((film) => film.genre.some((elem) => elem === genre)).length;
+  films.filter((film) => film.filmInfo.genre.some((elem) => elem === genre)).length;
 
 const getKeyWithMaxValue = (keys, values) => {
   let index = 0;
@@ -29,6 +29,6 @@ const getKeyWithMaxValue = (keys, values) => {
 };
 
 const getFilmsInRange = (from, to, films) => films.filter((film) =>
-  dayjs(film.watchingDate).isBetween(from, to, null, []));
+  dayjs(film.userDetails.watchingDate).isBetween(from, to, null, []));
 
 export {makeItemsUniq, countFilmsByGenre, getKeyWithMaxValue, getFilmsInRange};

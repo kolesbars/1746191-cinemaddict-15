@@ -1,18 +1,22 @@
-import {generateFilmCards} from './moc/film.js';
 import PagePresenter from './presenter/page.js';
 import FilterPresenter from './presenter/filters.js';
 import Movies from './model/movies.js';
 import Filters from './model/filters.js';
+import Comments from './model/comments.js';
 import {renderElement, remove} from './utils/render.js';
 import StatsView from './view/stats.js';
+import Api from './api.js';
+import {UpdateType} from './const.js';
 
-const FILM_COUNT = 25;
+const AUTHORIZATION = 'Basic 2uey65ae55ea56';
+const END_POINT = 'https://15.ecmascript.pages.academy/cinemaddict';
 
-const films = generateFilmCards(FILM_COUNT);
+const api = new Api(END_POINT, AUTHORIZATION);
 
 const moviesModel = new Movies();
-moviesModel.setMovies(films);
+
 const filterModel = new Filters();
+const commentsModel = new Comments();
 let statsComponent = new StatsView(moviesModel.getMovies());
 
 const headerContainer = document.querySelector('.header');
@@ -21,7 +25,7 @@ const footerContainer = document.querySelector('.footer');
 const statisticsContainer = footerContainer.querySelector('.footer__statistics');
 
 
-const pagePresenter = new PagePresenter(headerContainer, mainContainer, statisticsContainer, moviesModel, filterModel);
+const pagePresenter = new PagePresenter(headerContainer, mainContainer, statisticsContainer, moviesModel, filterModel, commentsModel, api);
 
 const handleMenuItemsClick = (type) => {
   if(type === 'stats') {
@@ -48,4 +52,12 @@ const filterPresenter = new FilterPresenter(mainContainer, filterModel, moviesMo
 
 filterPresenter.init();
 pagePresenter.init();
+
+api.getFilms()
+  .then((films) => {
+    moviesModel.setMovies(UpdateType.INIT, films);
+  })
+  .catch(() => {
+    moviesModel.setMovies(UpdateType.INIT, []);
+  });
 

@@ -5,44 +5,49 @@ import {nanoid} from 'nanoid';
 import he from 'he';
 
 const createPopupTemplate = (data) => {
-  const {poster, name, description, date, rating, comments, genre, duration, director, screenwriters, actors, country, age, isInWatchlist, isWatched, isFavorite, emoji, altText, commentText} = data;
-
-  const releaseDate = dayjs(date).format('D MMMM YYYY');
+  const {filmInfo, userDetails, commentsData, emotion, comment} = data;
+  const releaseDate = dayjs(filmInfo.release.date).format('D MMMM YYYY');
 
   const getGenres = () => {
     const genres = [];
-    for (let i = 0; i < genre.length; i++) {
-      const genresElement = `<span class="film-details__genre">${genre[i]}</span>`;
+    for (let i = 0; i < filmInfo.genre.length; i++) {
+      const genresElement = `<span class="film-details__genre">${filmInfo.genre[i]}</span>`;
       genres.push(genresElement);
     }
     return genres.join();
   };
 
-  const genresTitle = genre.length === 1 ? 'Genre' : 'Genres';
+  const genresTitle = filmInfo.genre.length === 1 ? 'Genre' : 'Genres';
+  let commentElements = [];
+  let commentsCount = 0;
 
-  const commentsCount = comments.length;
-  const commentsArray = [];
-  for (let i = 0; i < commentsCount; i++) {
-    commentsArray.push(new CommentView(comments[i]).getTemplate());
+  if (commentsData) {
+    commentsCount = commentsData.length;
+    const commentsArray = [];
+    for (let i = 0; i < commentsCount; i++) {
+      commentsArray.push(new CommentView(commentsData[i]).getTemplate());
+    }
+    commentElements = commentsArray.join('');
+  } else {
+    commentElements = '<span>Загрузка</span>';
   }
-  const commentElements = commentsArray.join('');
 
-  const inWatcheListClassName =  isInWatchlist ?
+  const inWatcheListClassName =  userDetails.isInWatchlist ?
     'film-details__control-button--watchlist film-details__control-button--active' : 'film-details__control-button--watchlist';
 
-  const watchedClassName = isWatched ?
+  const watchedClassName = userDetails.isWatched ?
     'film-details__control-button--watched film-details__control-button--active' :
     'film-details__control-button--watched';
 
-  const favoritesClassName = isFavorite ?
+  const favoritesClassName = userDetails.isFavorite ?
     'film-details__control-button--favorite film-details__control-button--active' :
     'film-details__control-button--favorite';
 
-  const createNewCommentEmoji = (img, text) => `${img ? `<img src="./images/emoji/${img}" width="55" height="55" alt="${text ? text : ' '}"></img>` : ' '}`;
+  const createNewCommentEmoji = (img) => `${img ? `<img src="./images/emoji/${img}" width="55" height="55"></img>` : ' '}`;
 
   const createCommentText = () => {
-    if(commentText) {
-      return commentText;
+    if(comment) {
+      return comment;
     }
     return '';
   };
@@ -55,35 +60,35 @@ const createPopupTemplate = (data) => {
       </div>
       <div class="film-details__info-wrap">
         <div class="film-details__poster">
-          <img class="film-details__poster-img" src="./images/posters/${poster}" alt="${name}">
+          <img class="film-details__poster-img" src="${filmInfo.poster}" alt="${filmInfo.name}">
 
-          <p class="film-details__age">${age}+</p>
+          <p class="film-details__age">${filmInfo.age}+</p>
         </div>
 
         <div class="film-details__info">
           <div class="film-details__info-head">
             <div class="film-details__title-wrap">
-              <h3 class="film-details__title">${name}</h3>
-              <p class="film-details__title-original">Original: ${name}</p>
+              <h3 class="film-details__title">${filmInfo.name}</h3>
+              <p class="film-details__title-original">Original: ${filmInfo.altName}</p>
             </div>
 
             <div class="film-details__rating">
-              <p class="film-details__total-rating">${rating}</p>
+              <p class="film-details__total-rating">${filmInfo.rating}</p>
             </div>
           </div>
 
           <table class="film-details__table">
             <tr class="film-details__row">
               <td class="film-details__term">Director</td>
-              <td class="film-details__cell">${director}</td>
+              <td class="film-details__cell">${filmInfo.director}</td>
             </tr>
             <tr class="film-details__row">
               <td class="film-details__term">Writers</td>
-              <td class="film-details__cell">${screenwriters}</td>
+              <td class="film-details__cell">${filmInfo.screenwriters}</td>
             </tr>
             <tr class="film-details__row">
               <td class="film-details__term">Actors</td>
-              <td class="film-details__cell">${actors}</td>
+              <td class="film-details__cell">${filmInfo.actors}</td>
             </tr>
             <tr class="film-details__row">
               <td class="film-details__term">Release Date</td>
@@ -91,11 +96,11 @@ const createPopupTemplate = (data) => {
             </tr>
             <tr class="film-details__row">
               <td class="film-details__term">Runtime</td>
-              <td class="film-details__cell">${duration}</td>
+              <td class="film-details__cell">${filmInfo.duration}</td>
             </tr>
             <tr class="film-details__row">
               <td class="film-details__term">Country</td>
-              <td class="film-details__cell">${country}</td>
+              <td class="film-details__cell">${filmInfo.release.country}</td>
             </tr>
             <tr class="film-details__row">
               <td class="film-details__term">${genresTitle}</td>
@@ -106,7 +111,7 @@ const createPopupTemplate = (data) => {
           </table>
 
           <p class="film-details__film-description">
-            ${description}
+            ${filmInfo.description}
           </p>
         </div>
       </div>
@@ -120,14 +125,14 @@ const createPopupTemplate = (data) => {
 
     <div class="film-details__bottom-container">
       <section class="film-details__comments-wrap">
-        <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${comments.length}</span></h3>
+        <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${commentsCount}</span></h3>
         <ul class="film-details__comments-list">
           ${commentElements}
         </ul>
 
         <div class="film-details__new-comment">
           <div class="film-details__add-emoji-label">
-            ${createNewCommentEmoji(emoji, altText)}
+            ${createNewCommentEmoji(emotion)}
           </div>
 
           <label class="film-details__comment-label">
@@ -166,11 +171,9 @@ export default class PopupView extends Smart {
     super();
     this._popup = popup;
     this._data = {
-      emoji: '',
-      altText: '',
-      commentText: '',
+      emotion: '',
+      comment: '',
     };
-
     this._emojyContainer = this.getElement().querySelector('.film-details__add-emoji-label');
 
     this._closeButtonClickHandler = this._closeButtonClickHandler.bind(this);
@@ -190,9 +193,8 @@ export default class PopupView extends Smart {
 
   reset() {
     this.updateData({
-      emoji: '',
-      altText: '',
-      commentText: '',
+      emotion: '',
+      comment: '',
     });
   }
 
@@ -255,31 +257,28 @@ export default class PopupView extends Smart {
   _sleepingEmojiClickHandler(evt) {
     evt.preventDefault();
     this.updateData({
-      emoji: 'sleeping.png',
-      altText: 'emoji-sleeping',
+      emotion: 'sleeping.png',
     });
   }
 
   _pukeEmojiClickHandler(evt) {
     evt.preventDefault();
     this.updateData({
-      emoji: 'puke.png',
-      altText: 'emoji-puke',
+      emotion: 'puke.png',
     });
   }
 
   _angryEmojiClickHandler(evt) {
     evt.preventDefault();
     this.updateData({
-      emoji: 'angry.png',
-      altText: 'emoji-angry',
+      emotion: 'angry.png',
     });
   }
 
   _commentTextInputHandler(evt) {
     evt.preventDefault();
     this.updateData({
-      commentText: evt.target.value,
+      comment: evt.target.value,
     }, true);
   }
 
@@ -352,4 +351,7 @@ export default class PopupView extends Smart {
     );
   }
 
+  setComments(comments) {
+    this._comments = comments;
+  }
 }

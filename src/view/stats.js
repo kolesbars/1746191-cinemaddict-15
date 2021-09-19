@@ -10,7 +10,7 @@ const renderChart = (statisticCtx, films) => {
   const BAR_HEIGHT = 50;
   statisticCtx.height = BAR_HEIGHT * 5;
 
-  const filmGenres = films.map((film) => film.genre);
+  const filmGenres = films.map((film) => film.filmInfo.genre);
   const uniqGenres = makeItemsUniq(filmGenres);
   const filmByGenreCounts = uniqGenres.map((genre) => countFilmsByGenre(films, genre));
   getKeyWithMaxValue (uniqGenres, filmByGenreCounts);
@@ -79,7 +79,7 @@ const createStatsTemplate = (data) => {
   const filmsInRange = getFilmsInRange(dateFrom, dateTo, films);
   const watchedFilmsCount = filmsInRange.length;
   const durations = [];
-  filmsInRange.forEach((film) => durations.push(film.duration));
+  filmsInRange.forEach((film) => durations.push(film.filmInfo.duration));
 
   const getTotalDuration = () => {
     let totalDuration = 0;
@@ -91,7 +91,7 @@ const createStatsTemplate = (data) => {
   };
 
   const getTopGenre = () => {
-    const filmGenres = filmsInRange.map((film) => film.genre);
+    const filmGenres = filmsInRange.map((film) => film.filmInfo.genre);
     const uniqGenres = makeItemsUniq(filmGenres);
     if(uniqGenres.length !== 0) {
       const filmByGenreCounts = uniqGenres.map((genre) => countFilmsByGenre(filmsInRange, genre));
@@ -151,7 +151,7 @@ const createStatsTemplate = (data) => {
 export default class StatsView extends Smart {
   constructor(films) {
     super();
-    this._films = films.filter((film) => film.isWatched === true);
+    this._films = films.filter((film) => film.userDetails.isWatched === true);
     this._data = {
       films: this._films,
       dateFrom: (() => {

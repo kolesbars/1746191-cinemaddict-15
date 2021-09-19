@@ -2,7 +2,7 @@ import Abstract from './abstract.js';
 import {getProfileRating} from '../utils/common.js';
 
 const createRatingTemplate = (films) => {
-  const watchedFilms = films.filter((film) => film.isWatched === true);
+  const watchedFilms = films.filter((film) => film.userDetails.isWatched === true);
 
   return `<section class="header__profile profile">
     <p class="profile__rating">${getProfileRating(watchedFilms.length)}</p>

@@ -3,32 +3,32 @@ import Abstract from './abstract.js';
 import {getTimeFromMins} from '../utils/common.js';
 
 const createCardTemplate = (data) => {
-  const {poster, name, description, rating, comments, date, genre, duration, isInWatchlist, isWatched, isFavorite} = data;
+  const {filmInfo, comments, userDetails} = data;
 
-  const filmDuration = getTimeFromMins(duration);
-  const releaseDate = dayjs(date).format('DD MMMM YYYY');
+  const filmDuration = getTimeFromMins(filmInfo.duration);
+  const releaseDate = dayjs(filmInfo.release.date).format('DD MMMM YYYY');
 
-  const inWatcheListClassName =  isInWatchlist ?
+  const inWatcheListClassName =  userDetails.isInWatchlist ?
     'film-card__controls-item--add-to-watchlist film-card__controls-item--active' : 'film-card__controls-item--add-to-watchlist';
 
-  const watchedClassName = isWatched ?
+  const watchedClassName = userDetails.isWatched ?
     'film-card__controls-item--mark-as-watched film-card__controls-item--active' :
     'film-card__controls-item--mark-as-watched';
 
-  const favoritesClassName = isFavorite ?
+  const favoritesClassName = userDetails.isFavorite ?
     'film-card__controls-item--favorite film-card__controls-item--active' :
     'film-card__controls-item--favorite';
 
   return `<article class="film-card">
-          <h3 class="film-card__title">${name}</h3>
-          <p class="film-card__rating">${rating}</p>
+          <h3 class="film-card__title">${filmInfo.name}</h3>
+          <p class="film-card__rating">${filmInfo.rating}</p>
           <p class="film-card__info">
             <span class="film-card__year">${releaseDate}</span>
             <span class="film-card__duration">${filmDuration}</span>
-            <span class="film-card__genre">${genre[0]}</span>
+            <span class="film-card__genre">${filmInfo.genre[0]}</span>
           </p>
-          <img src="./images/posters/${poster}" alt="${name}" class="film-card__poster">
-          <p class="film-card__description">${description}</p>
+          <img src="${filmInfo.poster}" alt="${filmInfo.name}" class="film-card__poster">
+          <p class="film-card__description">${filmInfo.description}</p>
           <a class="film-card__comments">${comments.length} comments</a>
           <div class="film-card__controls">
             <button class="film-card__controls-item ${inWatcheListClassName}" type="button">Add to watchlist</button>

@@ -39,23 +39,23 @@ const getWeightForNullDate = (dateA, dateB) => {
 };
 
 const sortByDate = (filmA, filmB) => {
-  const weight = getWeightForNullDate(filmA.date, filmB.date);
+  const weight = getWeightForNullDate(filmA.filmInfo.release.date, filmB.filmInfo.release.date);
 
   if (weight !== null) {
     return weight;
   }
 
-  return dayjs(filmB.date).diff(dayjs(filmA.date));
+  return dayjs(filmB.filmInfo.release.date).diff(dayjs(filmA.filmInfo.release.date));
 };
 
 const sortByRating = (filmA, filmB) => {
-  const weight = getWeightForNullDate(filmA.rating, filmB.rating);
+  const weight = getWeightForNullDate(filmA.filmInfo.rating, filmB.filmInfo.rating);
 
   if (weight !== null) {
     return weight;
   }
 
-  return filmB.rating - filmA.rating;
+  return filmB.filmInfo.rating - filmA.filmInfo.rating;
 };
 
 const sortByComments = (filmA, filmB) => {

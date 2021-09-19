@@ -1,14 +1,16 @@
 import FilmCardView from '../view/film-card.js';
 import PopupView from '../view/popup-view.js';
 import {renderElement, remove, replace} from '../utils/render.js';
-import {UpdateType} from '../const.js';
+import {UpdateType, UserAction} from '../const.js';
 
 export default class Movie {
-  constructor(container, changeData, callback) {
+  constructor(container, changeData, callback, commentsModel, api) {
     this._filmListContainer = container;
     this._changeData = changeData;
     this._bodyElement = document.querySelector('body');
     this._hidePopup = callback;
+    this._commentsModel = commentsModel;
+    this._api = api;
 
     this._filmCardComponent = null;
     this._popupComponent = null;
@@ -22,6 +24,9 @@ export default class Movie {
     this._handleDeleteComment = this._handleDeleteComment.bind(this);
     this._handleAddComment = this._handleAddComment.bind(this);
     this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
+    this._handleSetComments = this._handleSetComments.bind(this);
+
+    this._commentsModel.addObserver(this._handleModelEvent);
   }
 
   init(film, isShowUpdatePopup) {
@@ -29,6 +34,7 @@ export default class Movie {
     const prevPopupComponent = this._popupComponent;
 
     this._film = film;
+    this._comments = this._commentsModel.getComments();
     this._filmCardComponent = new FilmCardView(film);
     this._popupComponent = new PopupView(film);
 
@@ -67,8 +73,18 @@ export default class Movie {
     remove(prevPopupComponent);
   }
 
+  _handleModelEvent() {
+    this.init();
+  }
+
   _renderPopup(film, popup) {
     film.setShowPopupClickHandler(() => {
+      this._api.getComments(this._film)
+        .then((comments) => {
+          this._handleSetComments(comments);
+        })
+        .catch(() => this._handleSetComments([]));
+
       this._hidePopup();
       popup.reset(this._film);
       this._bodyElement.appendChild(popup.getElement());
@@ -95,14 +111,33 @@ export default class Movie {
     }
   }
 
+  _handleSetComments(update) {
+    this._changeData(
+      UserAction.UPDATE_COMMENTS,
+      UpdateType.CARD,
+      Object.assign(
+        {},
+        this._film,
+        {
+          commentsData: update,
+        },
+      ),
+    );
+  }
+
   _handlePopupWatcheList() {
     this._changeData(
+      UserAction.UPDATE_FILMS,
       UpdateType.POPUP,
       Object.assign(
         {},
         this._film,
         {
-          isInWatchlist: !this._film.isInWatchlist,
+          userDetails: {
+            isInWatchlist: !this._film.userDetails.isInWatchlist,
+            isWatched: this._film.userDetails.isWatched,
+            isFavorite: this._film.userDetails.isFavorite,
+          },
         },
       ),
     );
@@ -110,12 +145,17 @@ export default class Movie {
 
   _handleWatcheList() {
     this._changeData(
+      UserAction.UPDATE_FILMS,
       UpdateType.FILMS,
       Object.assign(
         {},
         this._film,
         {
-          isInWatchlist: !this._film.isInWatchlist,
+          userDetails: {
+            isInWatchlist: !this._film.userDetails.isInWatchlist,
+            isWatched: this._film.userDetails.isWatched,
+            isFavorite: this._film.userDetails.isFavorite,
+          },
         },
       ),
     );
@@ -123,12 +163,17 @@ export default class Movie {
 
   _handlePopupWatched() {
     this._changeData(
+      UserAction.UPDATE_FILMS,
       UpdateType.POPUP,
       Object.assign(
         {},
         this._film,
         {
-          isWatched: !this._film.isWatched,
+          userDetails: {
+            isInWatchlist: this._film.userDetails.isInWatchlist,
+            isWatched: !this._film.userDetails.isWatched,
+            isFavorite: this._film.userDetails.isFavorite,
+          },
         },
       ),
     );
@@ -136,12 +181,17 @@ export default class Movie {
 
   _handleWatched() {
     this._changeData(
+      UserAction.UPDATE_FILMS,
       UpdateType.FILMS,
       Object.assign(
         {},
         this._film,
         {
-          isWatched: !this._film.isWatched,
+          userDetails: {
+            isInWatchlist: this._film.userDetails.isInWatchlist,
+            isWatched: !this._film.userDetails.isWatched,
+            isFavorite: this._film.userDetails.isFavorite,
+          },
         },
       ),
     );
@@ -149,12 +199,17 @@ export default class Movie {
 
   _handlePopupFavorites() {
     this._changeData(
+      UserAction.UPDATE_FILMS,
       UpdateType.POPUP,
       Object.assign(
         {},
         this._film,
         {
-          isFavorite: !this._film.isFavorite,
+          userDetails: {
+            isInWatchlist: this._film.userDetails.isInWatchlist,
+            isWatched: this._film.userDetails.isWatched,
+            isFavorite: !this._film.userDetails.isFavorite,
+          },
         },
       ),
     );
@@ -162,12 +217,17 @@ export default class Movie {
 
   _handleFavorites() {
     this._changeData(
+      UserAction.UPDATE_FILMS,
       UpdateType.FILMS,
       Object.assign(
         {},
         this._film,
         {
-          isFavorite: !this._film.isFavorite,
+          userDetails: {
+            isInWatchlist: this._film.userDetails.isInWatchlist,
+            isWatched: this._film.userDetails.isWatched,
+            isFavorite: !this._film.userDetails.isFavorite,
+          },
         },
       ),
     );
@@ -175,6 +235,7 @@ export default class Movie {
 
   _handleDeleteComment(id) {
     this._changeData(
+      UserAction.UPDATE_FILMS,
       UpdateType.CARD,
       Object.assign(
         {},
@@ -188,6 +249,7 @@ export default class Movie {
 
   _handleAddComment(comment) {
     this._changeData(
+      UserAction.UPDATE_FILMS,
       UpdateType.CARD,
       Object.assign(
         {},

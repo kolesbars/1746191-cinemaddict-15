@@ -1,8 +1,14 @@
+const UserAction = {
+  UPDATE_FILMS: 'films',
+  UPDATE_COMMENTS: 'comments',
+};
+
 const UpdateType = {
   CARD: 'CARD',
   FILMS: 'FILMS',
   POPUP: 'POPUP',
   FILTER: 'FILTER',
+  INIT: 'INIT',
 };
 
 const FilterType = {
@@ -35,4 +41,4 @@ const StatsRanges = {
   YEAR: 365,
 };
 
-export {UpdateType, FilterType, SortType, Genres, StatsRanges};
+export {UserAction, UpdateType, FilterType, SortType, Genres, StatsRanges};

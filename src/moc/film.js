@@ -227,23 +227,30 @@ const generateFilmCards = (quantity) => {
   for (let i = 0; i < quantity; i++) {
     const card = {
       id: nanoid(),
-      poster: generatePoster(),
-      name: generateFilmName(),
-      description: generateDescription(),
       comments: collectComments(),
-      rating: getRandomFloat(0, 10),
-      date: generateReleaseDate(),
-      genre: generateGenre(),
-      duration: generateDuration(),
-      isInWatchlist: Boolean(getRandomInteger(0, 1)),
-      isWatched: Boolean(getRandomInteger(0, 1)),
-      watchingDate: generateWatchingDate(),
-      isFavorite: Boolean(getRandomInteger(0, 1)),
-      director: generateDirector(),
-      screenwriters: generateScreenwriters(),
-      actors: generateActors(),
-      country: generateCountry(),
-      age: getRandomInteger(0, 18),
+      filmInfo: {
+        poster: generatePoster(),
+        name: generateFilmName(),
+        altName: generateFilmName(),
+        description: generateDescription(),
+        rating: getRandomFloat(0, 10),
+        genre: generateGenre(),
+        duration: generateDuration(),
+        director: generateDirector(),
+        screenwriters: generateScreenwriters(),
+        actors: generateActors(),
+        age: getRandomInteger(0, 18),
+        release: {
+          country: generateCountry(),
+          date: generateReleaseDate(),
+        },
+      },
+      userDetails: {
+        isInWatchlist: Boolean(getRandomInteger(0, 1)),
+        isWatched: Boolean(getRandomInteger(0, 1)),
+        watchingDate: generateWatchingDate(),
+        isFavorite: Boolean(getRandomInteger(0, 1)),
+      },
     };
     filmCards.push(card);
   }
