@@ -1,11 +1,14 @@
 import Abstract from './abstract.js';
 
-const createFilmsQuantityTemplate = () => (
-  '<p>130 291 movies inside</p>'
-);
+const createFilmsQuantityTemplate = (films) => `<p>${films.length} movies inside</p>`;
 
 export default class FilmQuantityView extends Abstract {
+  constructor(films) {
+    super();
+    this._films = films;
+  }
+
   getTemplate() {
-    return createFilmsQuantityTemplate();
+    return createFilmsQuantityTemplate(this._films);
   }
 }

@@ -6,7 +6,7 @@ const createCardTemplate = (data) => {
   const {filmInfo, comments, userDetails} = data;
 
   const filmDuration = getTimeFromMins(filmInfo.duration);
-  const releaseDate = dayjs(filmInfo.release.date).format('DD MMMM YYYY');
+  const releaseDate = dayjs(filmInfo.release.date).format('YYYY');
 
   const inWatcheListClassName =  userDetails.isInWatchlist ?
     'film-card__controls-item--add-to-watchlist film-card__controls-item--active' : 'film-card__controls-item--add-to-watchlist';
@@ -28,7 +28,7 @@ const createCardTemplate = (data) => {
             <span class="film-card__genre">${filmInfo.genre[0]}</span>
           </p>
           <img src="${filmInfo.poster}" alt="${filmInfo.name}" class="film-card__poster">
-          <p class="film-card__description">${filmInfo.description}</p>
+          <p class="film-card__description">${filmInfo.description.length <= 140 ? filmInfo.description : `${filmInfo.description.substring(0, 139)}...`}</p>
           <a class="film-card__comments">${comments.length} comments</a>
           <div class="film-card__controls">
             <button class="film-card__controls-item ${inWatcheListClassName}" type="button">Add to watchlist</button>

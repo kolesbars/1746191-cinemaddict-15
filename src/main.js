@@ -2,7 +2,6 @@ import PagePresenter from './presenter/page.js';
 import FilterPresenter from './presenter/filters.js';
 import Movies from './model/movies.js';
 import Filters from './model/filters.js';
-import Comments from './model/comments.js';
 import {renderElement, remove} from './utils/render.js';
 import StatsView from './view/stats.js';
 import Api from './api.js';
@@ -16,7 +15,6 @@ const api = new Api(END_POINT, AUTHORIZATION);
 const moviesModel = new Movies();
 
 const filterModel = new Filters();
-const commentsModel = new Comments();
 let statsComponent = new StatsView(moviesModel.getMovies());
 
 const headerContainer = document.querySelector('.header');
@@ -24,8 +22,7 @@ const mainContainer = document.querySelector('.main');
 const footerContainer = document.querySelector('.footer');
 const statisticsContainer = footerContainer.querySelector('.footer__statistics');
 
-
-const pagePresenter = new PagePresenter(headerContainer, mainContainer, statisticsContainer, moviesModel, filterModel, commentsModel, api);
+const pagePresenter = new PagePresenter(headerContainer, mainContainer, statisticsContainer, moviesModel, filterModel, api);
 
 const handleMenuItemsClick = (type) => {
   if(type === 'stats') {

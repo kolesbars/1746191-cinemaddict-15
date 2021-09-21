@@ -18,13 +18,12 @@ import {SortType} from '../const.js';
 const FILM_COUNT_PER_STEP = 5;
 
 export default class PagePresenter {
-  constructor(headerContainer, mainContainer, footerContainer, moviesModel, filterModel, commentsModel, api) {
+  constructor(headerContainer, mainContainer, footerContainer, moviesModel, filterModel, api) {
     this._headerContainer = headerContainer;
     this._mainContainer = mainContainer;
     this._footerContainer = footerContainer;
     this._moviesModel = moviesModel;
     this._filterModel = filterModel;
-    this._commentsModel = commentsModel;
     this._renderedFilmCount = FILM_COUNT_PER_STEP;
     this._filmPresenters = new Map;
     this._filterType = FilterType.ALL;
@@ -36,9 +35,7 @@ export default class PagePresenter {
     this._noFilmComponent = null;
     this._sortingComponent = null;
 
-    this._ratingComponent = new RatingView(moviesModel.getMovies());
     this._contentComponent = new SiteContent();
-    this._filmQuantityComponent = new FilmQuantityView();
     this._topFilmsComponent = new TopFilmsView();
     this._mostCommentedFilmsComponent = new MostCommentedView();
     this._statsButtonComponent = new StatsButtonView();
@@ -53,10 +50,8 @@ export default class PagePresenter {
 
   init() {
     this._renderPage();
-
     this._moviesModel.addObserver(this._handleModelEvent);
     this._filterModel.addObserver(this._handleModelEvent);
-    this._commentsModel.addObserver(this._handleModelEvent);
   }
 
   destroy() {
@@ -64,7 +59,6 @@ export default class PagePresenter {
 
     this._moviesModel.removeObserver(this._handleModelEvent);
     this._filterModel.removeObserver(this._handleModelEvent);
-    this._commentsModel.removeObserver(this._handleModelEvent);
   }
 
   _getFilms() {
@@ -118,6 +112,7 @@ export default class PagePresenter {
         this._clearPage();
         this._isLoading = false;
         this._renderPage();
+        this._renderFilmsQuntity();
         break;
     }
   }
@@ -144,6 +139,7 @@ export default class PagePresenter {
   }
 
   _renderRating() {
+    this._ratingComponent = new RatingView(this._moviesModel.getMovies());
     renderElement( this._headerContainer, this._ratingComponent.getElement());
   }
 
@@ -152,6 +148,7 @@ export default class PagePresenter {
   }
 
   _renderFilmsQuntity() {
+    this._filmQuantityComponent = new FilmQuantityView(this._moviesModel.getMovies());
     renderElement(this._footerContainer, this._filmQuantityComponent.getElement());
   }
 
@@ -161,7 +158,7 @@ export default class PagePresenter {
   }
 
   _renderFilm(film, container) {
-    const filmPresenter = new Movie(container, this._handleViewAction, this._hidePopup, this._commentsModel, this._api);
+    const filmPresenter = new Movie(container, this._handleViewAction, this._hidePopup, this._api);
     filmPresenter.init(film);
     this._filmPresenters.set(film.id, filmPresenter);
   }
@@ -228,6 +225,7 @@ export default class PagePresenter {
     remove(this._loadingComponent);
     remove(this._topFilmsComponent);
     remove(this._mostCommentedFilmsComponent);
+    remove(this._ratingComponent);
 
     if(this._noFilmComponent) {
       remove(this._noFilmComponent);
@@ -263,7 +261,6 @@ export default class PagePresenter {
     this._renderRating();
     this._renderSort();
     this._renderContent();
-    this._renderFilmsQuntity();
 
     if(filmsCount === 0 && !this._isLoading) {
       this._renderNoFilms();

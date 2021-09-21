@@ -4,16 +4,16 @@ import {renderElement, remove, replace} from '../utils/render.js';
 import {UpdateType, UserAction} from '../const.js';
 
 export default class Movie {
-  constructor(container, changeData, callback, commentsModel, api) {
+  constructor(container, changeData, callback, api) {
     this._filmListContainer = container;
     this._changeData = changeData;
     this._bodyElement = document.querySelector('body');
     this._hidePopup = callback;
-    this._commentsModel = commentsModel;
     this._api = api;
 
     this._filmCardComponent = null;
     this._popupComponent = null;
+    this._isShowPopup = false;
 
     this._handleWatcheList = this._handleWatcheList.bind(this);
     this._handleWatched = this._handleWatched.bind(this);
@@ -25,8 +25,6 @@ export default class Movie {
     this._handleAddComment = this._handleAddComment.bind(this);
     this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
     this._handleSetComments = this._handleSetComments.bind(this);
-
-    this._commentsModel.addObserver(this._handleModelEvent);
   }
 
   init(film, isShowUpdatePopup) {
@@ -34,9 +32,9 @@ export default class Movie {
     const prevPopupComponent = this._popupComponent;
 
     this._film = film;
-    this._comments = this._commentsModel.getComments();
     this._filmCardComponent = new FilmCardView(film);
     this._popupComponent = new PopupView(film);
+    this._isShowPopup = isShowUpdatePopup;
 
     const cardsContainer = this._filmListContainer.getElement().querySelector('.films-list__container');
 
@@ -61,11 +59,12 @@ export default class Movie {
       this._renderPopup(this._filmCardComponent, this._popupComponent);
       this._bodyElement.classList.remove('hide-overflow');
 
-      if (isShowUpdatePopup) {
+      if (this._isShowPopup) {
         const scrollTop = prevPopupComponent.getElement().scrollTop;
         this._bodyElement.appendChild(this._popupComponent.getElement());
         this._popupComponent.getElement().scrollTop = scrollTop;
         this._bodyElement.classList.add('hide-overflow');
+
       }
     }
 
@@ -86,7 +85,6 @@ export default class Movie {
         .catch(() => this._handleSetComments([]));
 
       this._hidePopup();
-      popup.reset(this._film);
       this._bodyElement.appendChild(popup.getElement());
       this._bodyElement.classList.add('hide-overflow');
       document.addEventListener('keydown', this._escKeyDownHandler);
@@ -233,34 +231,44 @@ export default class Movie {
     );
   }
 
-  _handleDeleteComment(id) {
-    this._changeData(
-      UserAction.UPDATE_FILMS,
-      UpdateType.CARD,
-      Object.assign(
-        {},
-        this._film,
-        {
-          comments: this._film.comments.filter((comment) => comment.id !== id),
-        },
-      ),
-    );
+  _handleDeleteComment(com) {
+    this._api.deleteComment(com)
+      .then(() => {
+        this._changeData(
+          UserAction.UPDATE_COMMENTS,
+          UpdateType.CARD,
+          Object.assign(
+            {},
+            this._film,
+            {
+              commentsData: this._film.commentsData.filter((comment) => comment.id !== com.id),
+            },
+          ),
+        );
+      })
+      .catch(() => {
+        this._popupComponent.shake(this._popupComponent.reset());
+      });
   }
 
+
   _handleAddComment(comment) {
-    this._changeData(
-      UserAction.UPDATE_FILMS,
-      UpdateType.CARD,
-      Object.assign(
-        {},
-        this._film,
-        {
-          comments: [
-            ...this._film.comments,
-            comment,
-          ],
-        },
-      ),
-    );
+    this._api.addComment(this._film, comment)
+      .then((response) => {
+        this._changeData(
+          UserAction.UPDATE_COMMENTS,
+          UpdateType.CARD,
+          Object.assign(
+            {},
+            this._film,
+            {
+              commentsData: response.comments,
+            },
+          ),
+        );
+      })
+      .catch(() => {
+        this._popupComponent.shake(this._popupComponent.reset());
+      });
   }
 }
