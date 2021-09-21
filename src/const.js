@@ -1,8 +1,6 @@
 const UserAction = {
   UPDATE_FILMS: 'films',
   UPDATE_COMMENTS: 'comments',
-  ADD_COMMENT: 'add',
-  DELETE_COMMENT: 'delete',
 };
 
 const UpdateType = {
