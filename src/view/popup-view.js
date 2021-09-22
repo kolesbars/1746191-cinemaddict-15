@@ -207,6 +207,13 @@ export default class PopupView extends Smart {
     });
   }
 
+  resetAfterShake() {
+    this.updateData({
+      isDisabled: false,
+      deletingCommentId: null,
+    });
+  }
+
   getTemplate() {
     return createPopupTemplate(this._parsePopupToData(this._popup));
   }
@@ -291,9 +298,10 @@ export default class PopupView extends Smart {
   }
 
   _getNewComment() {
+    const parsedData = this._parsePopupToData(this._popup);
     return {
-      emotion: this._parsePopupToData(this._popup).emotion,
-      comment: this._parsePopupToData(this._popup).comment,
+      emotion: parsedData.emotion,
+      comment: parsedData.comment,
     };
   }
 
@@ -305,14 +313,6 @@ export default class PopupView extends Smart {
     this._callbacks.deleteComment(evt.target.closest('.film-details__comment'));
   }
 
-  setAddNewCommentHandler(callback) {
-    this._callbacks.addComment = callback;
-
-    this.getElement()
-      .querySelector('.film-details__comment-input')
-      .addEventListener('keydown', this._commentInputKeydownHandler);
-  }
-
   _commentInputKeydownHandler(evt) {
     if (evt.key === 'Enter' && evt.ctrlKey) {
       evt.preventDefault();
@@ -321,6 +321,22 @@ export default class PopupView extends Smart {
       });
       this._callbacks.addComment(this._getNewComment());
     }
+  }
+
+  _parsePopupToData(popup) {
+    return Object.assign(
+      {},
+      popup,
+      this._data,
+    );
+  }
+
+  setAddNewCommentHandler(callback) {
+    this._callbacks.addComment = callback;
+
+    this.getElement()
+      .querySelector('.film-details__comment-input')
+      .addEventListener('keydown', this._commentInputKeydownHandler);
   }
 
   setDeleteCommentClickHandler(callback) {
@@ -352,13 +368,5 @@ export default class PopupView extends Smart {
     this._callbacks.favoritesClick = callback;
     this.getElement().querySelector('.film-details__control-button--favorite')
       .addEventListener('click', this._favoritesClickHandler);
-  }
-
-  _parsePopupToData(popup) {
-    return Object.assign(
-      {},
-      popup,
-      this._data,
-    );
   }
 }

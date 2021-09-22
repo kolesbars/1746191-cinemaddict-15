@@ -83,4 +83,12 @@ const getProfileRating = (elements) => {
   }
 };
 
-export {getRandomInteger, getRandomFloat, sortByDate, sortByRating, sortByComments, getTimeFromMins, getProfileRating};
+export {
+  getRandomInteger,
+  getRandomFloat,
+  sortByDate,
+  sortByRating,
+  sortByComments,
+  getTimeFromMins,
+  getProfileRating
+};

@@ -72,6 +72,11 @@ export default class Movie {
     remove(prevPopupComponent);
   }
 
+  destroy() {
+    remove(this._filmCardComponent);
+    remove(this._popupComponent);
+  }
+
   _handleModelEvent() {
     this.init();
   }
@@ -95,11 +100,6 @@ export default class Movie {
       this._bodyElement.classList.remove('hide-overflow');
       document.removeEventListener('keydown', this._escKeyDownHandler);
     });
-  }
-
-  destroy() {
-    remove(this._filmCardComponent);
-    remove(this._popupComponent);
   }
 
   _escKeyDownHandler(evt) {
@@ -247,10 +247,9 @@ export default class Movie {
         );
       })
       .catch(() => {
-        this._popupComponent.shake(this._popupComponent.reset());
+        this._popupComponent.shake(() => this._popupComponent.resetAfterShake());
       });
   }
-
 
   _handleAddComment(comment) {
     this._api.addComment(this._film, comment)
@@ -268,7 +267,7 @@ export default class Movie {
         );
       })
       .catch(() => {
-        this._popupComponent.shake(this._popupComponent.reset());
+        this._popupComponent.shake(() => this._popupComponent.resetAfterShake());
       });
   }
 }

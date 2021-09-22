@@ -60,17 +60,17 @@ export default class SiteFiltersView extends Abstract {
     this._callbacks.filterTypeChange(evt.target.dataset.menuItem);
   }
 
-  setFilterTypeChangeHandler(callback) {
-    this._callbacks.filterTypeChange = callback;
-    this.getElement().querySelectorAll('.main-navigation__items').forEach((element) => element.addEventListener('click', this._filterTypeChangeHandler));
-  }
-
   _menuItemsClickHandler(evt) {
     if (evt.target.tagName !== 'A') {
       return;
     }
     evt.preventDefault();
     this._callbacks.menuItemClick(evt.target.dataset.menuItem);
+  }
+
+  setFilterTypeChangeHandler(callback) {
+    this._callbacks.filterTypeChange = callback;
+    this.getElement().querySelectorAll('.main-navigation__items').forEach((element) => element.addEventListener('click', this._filterTypeChangeHandler));
   }
 
   setMenuItemsClickHandler(callback) {

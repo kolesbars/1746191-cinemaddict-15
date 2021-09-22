@@ -24,15 +24,6 @@ const SortType = {
   RATING: 'rating',
 };
 
-const Genres = {
-  MUSICAL: 'Musical',
-  WESTERN: 'Western',
-  DRAMMA: 'Drama',
-  COMEDY: 'Comedy',
-  CARTOON: 'Cartoon',
-  MYSTERY: 'Mystery',
-};
-
 const StatsRanges = {
   ALL_TIME: 40000,
   TODAY: 1,
@@ -41,4 +32,4 @@ const StatsRanges = {
   YEAR: 365,
 };
 
-export {UserAction, UpdateType, FilterType, SortType, Genres, StatsRanges};
+export {UserAction, UpdateType, FilterType, SortType, StatsRanges};
