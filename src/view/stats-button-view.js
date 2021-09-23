@@ -2,7 +2,7 @@ import Abstract from './abstract';
 
 const createStatsButtonTemplate = () => '<a href="#stats" class="main-navigation__additional" data-menu-item="stats">Stats</a>';
 
-export default class StatsView extends Abstract {
+export default class StatsButtonView extends Abstract {
   constructor() {
     super();
 

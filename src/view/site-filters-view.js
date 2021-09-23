@@ -1,5 +1,5 @@
 import Abstract from './abstract.js';
-import StatsButtonView from './stats-button.js';
+import StatsButtonView from './stats-button-view.js';
 
 const createFilterItemTemplate = (filter, currentFilterType) => {
   const {type, count} = filter;

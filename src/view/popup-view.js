@@ -1,4 +1,4 @@
-import CommentView from './comment.js';
+import CommentView from './comment-view.js';
 import {getTimeFromMins} from '../utils/common.js';
 import dayjs from 'dayjs';
 import Smart from './smart.js';

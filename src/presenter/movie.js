@@ -1,4 +1,4 @@
-import FilmCardView from '../view/film-card.js';
+import FilmCardView from '../view/film-card-view.js';
 import PopupView from '../view/popup-view.js';
 import {renderElement, remove, replace} from '../utils/render.js';
 import {UpdateType, UserAction} from '../const.js';

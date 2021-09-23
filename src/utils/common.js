@@ -1,14 +1,5 @@
 import dayjs from 'dayjs';
 
-const getRandomInteger = (a = 0, b = 1) => {
-  const lower = Math.ceil(Math.min(a, b));
-  const upper = Math.floor(Math.max(a, b));
-
-  return Math.floor(lower + Math.random() * (upper - lower + 1));
-};
-
-const getRandomFloat = (min, max) => (Math.random() * (max - min) + min).toFixed(1);
-
 const getTimeFromMins = (mins) => {
   const hours = Math.trunc(mins/60);
   const minutes = mins % 60;
@@ -58,16 +49,6 @@ const sortByRating = (filmA, filmB) => {
   return filmB.filmInfo.rating - filmA.filmInfo.rating;
 };
 
-const sortByComments = (filmA, filmB) => {
-  const weight = getWeightForNullDate(filmA.comments, filmB.comments);
-
-  if (weight !== null) {
-    return weight;
-  }
-
-  return filmB.comments.length - filmA.comments.length;
-};
-
 const getProfileRating = (elements) => {
   if(elements >= 1 && elements < 10) {
     return 'novice';
@@ -84,11 +65,8 @@ const getProfileRating = (elements) => {
 };
 
 export {
-  getRandomInteger,
-  getRandomFloat,
   sortByDate,
   sortByRating,
-  sortByComments,
   getTimeFromMins,
   getProfileRating
 };

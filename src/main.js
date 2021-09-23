@@ -3,7 +3,7 @@ import FilterPresenter from './presenter/filters.js';
 import Movies from './model/movies.js';
 import Filters from './model/filters.js';
 import {renderElement, remove} from './utils/render.js';
-import StatsView from './view/stats.js';
+import StatsView from './view/stats-view.js';
 import Api from './api.js';
 import {UpdateType} from './const.js';
 

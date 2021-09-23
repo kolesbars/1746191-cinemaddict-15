@@ -1,10 +1,10 @@
-import RatingView from '../view/profile-rating.js';
-import SortingView from '../view/sorting.js';
-import SiteContent from '../view/content.js';
-import FilmQuantityView from '../view/films-quantity.js';
-import ShowMoreView from '../view/show-more-button.js';
+import RatingView from '../view/rating-view.js';
+import SortingView from '../view/sorting-view.js';
+import SiteContent from '../view/site-content.js';
+import FilmQuantityView from '../view/films-quantity-view.js';
+import ShowMoreView from '../view/show-more-view.js';
 import NoFilms from '../view/no-films.js';
-import StatsButtonView from '../view/stats-button.js';
+import StatsButtonView from '../view/stats-button-view.js';
 import Loading from '../view/loading.js';
 import {renderElement, remove} from '../utils/render.js';
 import {sortByDate, sortByRating} from '../utils/common.js';
